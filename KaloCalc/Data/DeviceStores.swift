@@ -7,7 +7,7 @@ final class UserDefaultsStore: KeyValueStore {
     private let defaults: UserDefaults
     init(_ defaults: UserDefaults = .standard) { self.defaults = defaults }
 
-    func string(_ key: String) -> String? { defaults.string(forKey: key) }
+    func string(_ key: String) -> String? { defaults.object(forKey: key) as? String }
     func int(_ key: String) -> Int? { defaults.object(forKey: key) as? Int }
     func double(_ key: String) -> Double? { defaults.object(forKey: key) as? Double }
     func bool(_ key: String) -> Bool? { defaults.object(forKey: key) as? Bool }
