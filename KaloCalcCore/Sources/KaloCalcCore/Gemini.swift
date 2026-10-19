@@ -47,6 +47,12 @@ public struct FoodEstimate: Equatable {
 /// Failures the UI turns into a localized message.
 public enum GeminiError: Error, Equatable {
     case noCandidates, empty, garbled, badModel(String)
+    /// The model id isn't known to the API (HTTP 404 on a model call).
+    case modelMissing(String)
+    /// HTTP 429, the free quota is used up.
+    case rateLimited
+    /// HTTP 500, 502, 503 or 504.
+    case overloaded
     case http(code: Int, detail: String?)
 }
 
