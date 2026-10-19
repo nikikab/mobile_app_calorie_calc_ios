@@ -28,6 +28,11 @@ public struct EntryValues: Equatable {
     public var proteinG: Double
     public var carbsG: Double
     public var fatG: Double
+
+    public init(meal: Meal, name: String, grams: Double, kcal: Int, proteinG: Double, carbsG: Double, fatG: Double) {
+        self.meal = meal; self.name = name; self.grams = grams; self.kcal = kcal
+        self.proteinG = proteinG; self.carbsG = carbsG; self.fatG = fatG
+    }
 }
 
 /// The dialog's text fields as values, or nil when the name is empty, the calories aren't a whole number of at least 0,
