@@ -12,7 +12,7 @@ LANGS = {"": "en", "bg": "bg", "de": "de", "es": "es", "fr": "fr"}
 
 def convert(text):
     text = text.replace("\\'", "'").replace('\\"', '"').replace("\\n", "\n").replace("\\@", "@").replace("\\?", "?")
-    text = re.sub(r"%(\d+)\$d", r"%\1$lld", text)
+    text = re.sub(r"%(\d+)\$([+\- 0#]*)d", r"%\1$\2lld", text)
     text = re.sub(r"%(\d+)\$s", r"%\1$@", text)
     return text
 

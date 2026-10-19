@@ -1489,31 +1489,31 @@
         "bg": {
           "stringUnit": {
             "state": "translated",
-            "value": "Активност: %1$+d kcal (изгорени %2$lld, очаквани %3$lld)"
+            "value": "Активност: %1$+lld kcal (изгорени %2$lld, очаквани %3$lld)"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktivität: %1$+d kcal (verbrannt %2$lld, erwartet %3$lld)"
+            "value": "Aktivität: %1$+lld kcal (verbrannt %2$lld, erwartet %3$lld)"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Activity: %1$+d kcal (burned %2$lld, expected %3$lld)"
+            "value": "Activity: %1$+lld kcal (burned %2$lld, expected %3$lld)"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Actividad: %1$+d kcal (quemadas %2$lld, esperadas %3$lld)"
+            "value": "Actividad: %1$+lld kcal (quemadas %2$lld, esperadas %3$lld)"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Activité : %1$+d kcal (brûlées %2$lld, attendues %3$lld)"
+            "value": "Activité : %1$+lld kcal (brûlées %2$lld, attendues %3$lld)"
           }
         }
       }

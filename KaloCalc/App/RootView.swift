@@ -1,15 +1,15 @@
 import SwiftUI
 
 /// The four tabs of the app, in the same order as on Android.
-enum AppTab: CaseIterable {
+enum AppTab: String, CaseIterable {
     case diary, progress, goal, settings
 
-    var title: LocalizedStringKey {
+    var title: String {
         switch self {
-        case .diary: "tab_diary"
-        case .progress: "tab_progress"
-        case .goal: "tab_goal"
-        case .settings: "tab_settings"
+        case .diary: tr("tab_diary")
+        case .progress: tr("tab_progress")
+        case .goal: tr("tab_goal")
+        case .settings: tr("tab_settings")
         }
     }
 
@@ -24,31 +24,36 @@ enum AppTab: CaseIterable {
 }
 
 struct RootView: View {
-    @State private var selection: AppTab = .diary
+    let model: AppModel
+    @State private var selection: AppTab
+
+    /// `-tab goal` and `-sheet entry` (launch arguments) open a given tab and dialog, for screenshots.
+    init(model: AppModel) {
+        self.model = model
+        _selection = State(initialValue: UserDefaults.standard.string(forKey: "tab").flatMap(AppTab.init(rawValue:)) ?? .diary)
+    }
 
     var body: some View {
         TabView(selection: $selection) {
             ForEach(AppTab.allCases, id: \.self) { tab in
-                NavigationStack {
-                    TabPlaceholder(title: tab.title)
-                }
-                .tabItem { Label(tab.title, systemImage: tab.systemImage) }
-                .tag(tab)
+                NavigationStack { content(for: tab) }
+                    .tabItem { Label(tab.title, systemImage: tab.systemImage) }
+                    .tag(tab)
             }
+        }
+    }
+
+    @ViewBuilder
+    private func content(for tab: AppTab) -> some View {
+        let sheet = UserDefaults.standard.string(forKey: "sheet")
+        switch tab {
+        case .diary: DiaryView(model: model, initialSheet: sheet)
+        case .goal: CalculatorView(model: model, initialSheet: sheet)
+        default: Text(tab.title).navigationTitle(tab.title)
         }
     }
 }
 
-/// Stands in for each screen until it is ported.
-private struct TabPlaceholder: View {
-    let title: LocalizedStringKey
-
-    var body: some View {
-        Text(title)
-            .navigationTitle(title)
-    }
-}
-
 #Preview {
-    RootView()
+    RootView(model: .demo())
 }

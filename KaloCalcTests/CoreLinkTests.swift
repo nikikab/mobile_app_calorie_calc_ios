@@ -4,6 +4,6 @@ import KaloCalcCore
 
 final class CoreLinkTests: XCTestCase {
     func testEveryTabHasAnIcon() {
-        for tab in AppTab.allCases { XCTAssertFalse(tab.systemImage.isEmpty) }
+        for tab in AppTab.allCases { XCTAssertFalse(tab.systemImage.isEmpty); XCTAssertFalse(tab.title.isEmpty) }
     }
 }

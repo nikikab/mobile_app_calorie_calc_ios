@@ -6,8 +6,13 @@ import Foundation
 enum AppStrings {
     nonisolated(unsafe) static var bundle: Bundle = .main
 
-    static func text(_ key: String, _ args: CVarArg...) -> String {
+    static func text(_ key: String, _ args: CVarArg...) -> String { text(key, args: args) }
+
+    static func text(_ key: String, args: [CVarArg]) -> String {
         let format = bundle.localizedString(forKey: key, value: key, table: nil)
         return args.isEmpty ? format : String(format: format, arguments: args)
     }
 }
+
+/// Short form of `AppStrings.text` for use in views.
+func tr(_ key: String, _ args: CVarArg...) -> String { AppStrings.text(key, args: args) }

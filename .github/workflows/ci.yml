@@ -23,9 +23,8 @@ jobs:
         run: brew install xcodegen
       - name: Generate the Xcode project
         run: xcodegen generate
-      - name: Build and test
+      - name: Pick a simulator
         run: |
-          set -o pipefail
           DEVICE=$(xcrun simctl list devices available -j | python3 -c "
           import json,sys
           for runtime, devs in json.load(sys.stdin)['devices'].items():
@@ -34,5 +33,15 @@ jobs:
                       if d['name'].startswith('iPhone'):
                           print(d['udid']); sys.exit()
           ")
-          xcodebuild test -project KaloCalc.xcodeproj -scheme KaloCalc \
+          echo "DEVICE=$DEVICE" >> "$GITHUB_ENV"
+      - name: Build and test
+        run: |
+          set -o pipefail
+          xcodebuild test -project KaloCalc.xcodeproj -scheme KaloCalc -derivedDataPath build \
             -destination "id=$DEVICE" CODE_SIGNING_ALLOWED=NO | tail -n 80
+      - name: Screenshots
+        run: tools/screenshots.sh "$DEVICE" build/Build/Products/Debug-iphonesimulator/KaloCalc.app screenshots
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/*.png
