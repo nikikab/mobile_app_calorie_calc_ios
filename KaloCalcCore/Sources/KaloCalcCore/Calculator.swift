@@ -1,7 +1,7 @@
 import Foundation
 
 /// Kotlin's `roundToInt` / `Math.round`: halves go up, also for negatives (-2.5 -> -2).
-func roundHalfUp(_ x: Double) -> Int { Int((x + 0.5).rounded(.down)) }
+public func roundHalfUp(_ x: Double) -> Int { Int((x + 0.5).rounded(.down)) }
 
 public enum Sex: String, Codable, CaseIterable { case male = "MALE", female = "FEMALE" }
 
