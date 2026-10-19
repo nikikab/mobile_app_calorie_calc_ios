@@ -130,7 +130,7 @@ struct CalculatorView: View {
         VStack(alignment: .leading, spacing: 4) {
             if let result = vm.result {
                 let t = vm.targets
-                Text("\(t.kcal) kcal").font(.largeTitle.bold())
+                Text(verbatim: "\(t.kcal) kcal").font(.largeTitle.bold())
                 Text(vm.activePlan.map { tr("calc_active_goal", $0.name) } ?? tr("calc_recommended"))
                 Text("BMR: \(result.bmr) kcal · TDEE: \(result.tdee) kcal").font(.footnote)
                 Text(tr("calc_macros_line", t.macros.proteinG, t.macros.carbsG, t.macros.fatG))

@@ -30,7 +30,7 @@ struct DiaryView: View {
             }
             ForEach(Meal.allCases, id: \.self) { meal in
                 let items = vm.entries(for: meal)
-                Section("\(meal.label) · \(vm.kcal(for: meal)) kcal") {
+                Section(header: Text(verbatim: "\(meal.label) · \(vm.kcal(for: meal)) kcal")) {
                     ForEach(items, id: \.id) { entry in
                         EntryRow(entry: entry)
                             .contentShape(Rectangle())
@@ -86,7 +86,7 @@ private struct SummaryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("\(summary.kcal) / \(summary.targetKcal) kcal").font(.title2.bold())
+                Text(verbatim: "\(summary.kcal) / \(summary.targetKcal) kcal").font(.title2.bold())
                 Spacer()
                 Button(action: onEditTarget) { Image(systemName: "pencil") }
                     .buttonStyle(.borderless)
@@ -115,7 +115,7 @@ private struct EntryRow: View {
                 Text(detail).font(.footnote).foregroundStyle(.secondary)
             }
             Spacer()
-            Text("\(entry.kcal) kcal")
+            Text(verbatim: "\(entry.kcal) kcal")
         }
     }
 
