@@ -34,6 +34,12 @@ def main(res, dest):
             if key in table:
                 entry["localizations"][code] = {"stringUnit": {"state": "translated", "value": table[key][0]}}
         strings[key] = entry
+    # Strings that exist only on iOS (no Android counterpart) live next to this script.
+    extra = Path(__file__).with_name("ios_strings.json")
+    if extra.exists():
+        for key, texts in json.loads(extra.read_text(encoding="utf-8")).items():
+            strings[key] = {"extractionState": "manual", "localizations": {
+                code: {"stringUnit": {"state": "translated", "value": value}} for code, value in texts.items()}}
     catalog = {"sourceLanguage": "en", "strings": strings, "version": "1.0"}
     Path(dest).write_text(json.dumps(catalog, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"{len(strings)} keys, languages: {', '.join(LANGS.values())}")

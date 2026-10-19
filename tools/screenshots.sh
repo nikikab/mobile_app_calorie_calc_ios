@@ -29,7 +29,10 @@ sleep 10
 
 for lang in en bg; do
   shot diary "$lang" -tab diary
-  shot diary-add "$lang" -tab diary -sheet entry
+  shot search "$lang" -tab diary -sheet search
+  shot photo "$lang" -tab diary -sheet photo
+  shot edit-estimate "$lang" -tab diary -sheet edit
+  shot manual "$lang" -tab diary -sheet manual
   shot diary-target "$lang" -tab diary -sheet target
   shot goal "$lang" -tab goal
   shot goal-plan "$lang" -tab goal -sheet plan

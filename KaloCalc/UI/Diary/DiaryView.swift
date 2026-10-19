@@ -2,23 +2,35 @@ import SwiftUI
 import KaloCalcCore
 
 private enum DiarySheet: Identifiable {
-    case add, edit(FoodEntry), target
+    case edit(FoodEntry), target, photo(String)
     var id: String {
         switch self {
-        case .add: "add"
         case .edit(let e): "edit-\(e.id)"
         case .target: "target"
+        case .photo(let name): "photo-\(name)"
         }
     }
 }
 
+/// Where the "add food" button leads. `demo` fills the screen with sample content for screenshots.
+private struct SearchRoute: Hashable {
+    var autoCamera = false
+    var demo: String?
+}
+
 struct DiaryView: View {
+    private let model: AppModel
+    private let onOpenSettings: () -> Void
     @State private var vm: DiaryViewModel
     @State private var sheet: DiarySheet?
+    @State private var route: SearchRoute?
 
-    init(model: AppModel, initialSheet: String? = nil) {
+    init(model: AppModel, initialSheet: String? = nil, onOpenSettings: @escaping () -> Void = {}) {
+        self.model = model
+        self.onOpenSettings = onOpenSettings
         _vm = State(initialValue: DiaryViewModel(model: model))
-        _sheet = State(initialValue: initialSheet == "entry" ? .add : initialSheet == "target" ? .target : nil)
+        _sheet = State(initialValue: initialSheet == "target" ? .target : nil)
+        _route = State(initialValue: ["search", "photo", "edit", "manual"].contains(initialSheet) ? SearchRoute(demo: initialSheet) : nil)
     }
 
     var body: some View {
@@ -32,7 +44,7 @@ struct DiaryView: View {
                 let items = vm.entries(for: meal)
                 Section(header: Text(verbatim: "\(meal.label) · \(vm.kcal(for: meal)) kcal")) {
                     ForEach(items, id: \.id) { entry in
-                        EntryRow(entry: entry)
+                        EntryRow(entry: entry, photos: model.photos, onPhoto: { sheet = .photo($0) })
                             .contentShape(Rectangle())
                             .onTapGesture { sheet = .edit(entry) }
                             .swipeActions {
@@ -45,14 +57,18 @@ struct DiaryView: View {
         .navigationTitle(tr("tab_diary"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { sheet = .add } label: { Label(tr("diary_add_food"), systemImage: "plus") }
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button { route = SearchRoute(autoCamera: true) } label: { Label(tr("diary_take_photo"), systemImage: "camera") }
+                Button { route = SearchRoute() } label: { Label(tr("diary_add_food"), systemImage: "plus") }
             }
+        }
+        .navigationDestination(item: $route) { r in
+            FoodSearchView(model: model, diary: vm, autoCamera: r.autoCamera, demo: r.demo, onOpenSettings: onOpenSettings)
         }
         .sheet(item: $sheet) { which in
             switch which {
-            case .add:
-                EntryFormSheet(existing: nil, favorites: vm.favorites, onRemoveFavorite: vm.removeFavorite) { vm.add($0) }
+            case .photo(let name):
+                PhotoFull(name: name, photos: model.photos)
             case .edit(let entry):
                 EntryFormSheet(existing: entry, favorites: [], onRemoveFavorite: { _ in }) { vm.update(entry, with: $0) }
             case .target:
@@ -107,9 +123,14 @@ private struct SummaryCard: View {
 
 private struct EntryRow: View {
     let entry: FoodEntry
+    let photos: PhotoStore
+    let onPhoto: (String) -> Void
 
     var body: some View {
         HStack {
+            if let photo = entry.photoPath {
+                PhotoThumb(name: photo, photos: photos).onTapGesture { onPhoto(photo) }
+            }
             VStack(alignment: .leading) {
                 Text(entry.name)
                 Text(detail).font(.footnote).foregroundStyle(.secondary)

@@ -41,11 +41,27 @@ final class DiaryViewModel {
         reload()
     }
 
-    func add(_ v: EntryValues) {
+    /// `pendingPhoto` is the photo that was taken for this dish, if any; it is stored with the entry.
+    func add(_ v: EntryValues, pendingPhoto: String? = nil) {
         perform {
+            let photo = try model.photos.commitPending(pendingPhoto)
             try model.repository.insert(FoodEntry(
                 epochDay: day, meal: v.meal, name: v.name, kcal: v.kcal, proteinG: v.proteinG, carbsG: v.carbsG, fatG: v.fatG,
-                epochMillis: entryTimeMillis(epochDay: day), grams: v.grams))
+                photoPath: photo, epochMillis: entryTimeMillis(epochDay: day), grams: v.grams))
+            reload()
+        }
+    }
+
+    /// Adds every item to `meal` in one go; each entry gets its own copy of the photo so deleting one keeps the others.
+    func addAll(meal: Meal, items: [FoodEstimate], pendingPhoto: String?) {
+        perform {
+            for e in items {
+                let photo = try model.photos.commitPending(pendingPhoto, keepPending: true)
+                try model.repository.insert(FoodEntry(
+                    epochDay: day, meal: meal, name: e.name, kcal: roundHalfUp(e.kcal), proteinG: e.proteinG, carbsG: e.carbsG, fatG: e.fatG,
+                    photoPath: photo, epochMillis: entryTimeMillis(epochDay: day), grams: e.grams))
+            }
+            model.photos.discardPending(pendingPhoto)
             reload()
         }
     }
@@ -64,6 +80,7 @@ final class DiaryViewModel {
     func delete(_ entry: FoodEntry) {
         perform {
             try model.repository.deleteEntry(id: entry.id)
+            model.photos.delete(entry.photoPath)
             reload()
         }
     }

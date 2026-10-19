@@ -30,6 +30,7 @@ targets:
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
+        NSCameraUsageDescription: The camera is used to photograph food and scan barcodes.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nikikabadzhov.kalocalc

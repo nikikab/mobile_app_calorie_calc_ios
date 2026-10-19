@@ -1,0 +1,9 @@
+{
+  "camera_unavailable": {
+    "en": "No camera is available on this device.",
+    "bg": "На това устройство няма налична камера.",
+    "de": "Auf diesem Gerät ist keine Kamera verfügbar.",
+    "es": "No hay ninguna cámara disponible en este dispositivo.",
+    "fr": "Aucun appareil photo n'est disponible sur cet appareil."
+  }
+}

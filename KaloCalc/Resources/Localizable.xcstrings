@@ -1483,6 +1483,41 @@
         }
       }
     },
+    "camera_unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На това устройство няма налична камера."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf diesem Gerät ist keine Kamera verfügbar."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No camera is available on this device."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay ninguna cámara disponible en este dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun appareil photo n'est disponible sur cet appareil."
+          }
+        }
+      }
+    },
     "diary_activity_adjust": {
       "extractionState": "manual",
       "localizations": {

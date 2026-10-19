@@ -47,7 +47,7 @@ struct RootView: View {
     private func content(for tab: AppTab) -> some View {
         let sheet = UserDefaults.standard.string(forKey: "sheet")
         switch tab {
-        case .diary: DiaryView(model: model, initialSheet: sheet)
+        case .diary: DiaryView(model: model, initialSheet: sheet, onOpenSettings: { selection = .settings })
         case .goal: CalculatorView(model: model, initialSheet: sheet)
         default: Text(tab.title).navigationTitle(tab.title)
         }

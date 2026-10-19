@@ -11,9 +11,11 @@ final class AppModel {
     let repository: Repository
     let profileStore: ProfileStore
     let settingsStore: SettingsStore
+    let photos: PhotoStore
 
-    init(container: ModelContainer, values: KeyValueStore, secrets: SecretStore) {
+    init(container: ModelContainer, values: KeyValueStore, secrets: SecretStore, photos: PhotoStore = .shared) {
         self.container = container
+        self.photos = photos
         repository = Repository(context: container.mainContext, counters: values)
         profileStore = ProfileStore(values)
         settingsStore = SettingsStore(values, secrets: secrets)
@@ -31,6 +33,6 @@ final class AppModel {
     /// Empty and throwaway, for tests and previews.
     static func inMemory() -> AppModel {
         let memory = MemoryKeyValueStore()
-        return AppModel(container: try! Persistence.makeContainer(inMemory: true), values: memory, secrets: memory)
+        return AppModel(container: try! Persistence.makeContainer(inMemory: true), values: memory, secrets: memory, photos: .temporary())
     }
 }
