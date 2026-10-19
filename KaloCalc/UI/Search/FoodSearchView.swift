@@ -98,7 +98,7 @@ struct FoodSearchView: View {
                 actionButton("camera", "diary_take_photo") { camera = true }
                     .disabled(!CameraPicker.isAvailable)
                 PhotosPicker(selection: $pickedItem, matching: .images) {
-                    Label(tr("search_pick_photo"), systemImage: "photo.on.rectangle").frame(maxWidth: .infinity).lineLimit(1)
+                    actionLabel("photo.on.rectangle", "search_pick_photo")
                 }
                 .buttonStyle(.bordered)
             }
@@ -110,8 +110,18 @@ struct FoodSearchView: View {
     }
 
     private func actionButton(_ image: String, _ key: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) { Label(tr(key), systemImage: image).frame(maxWidth: .infinity).lineLimit(1) }
+        Button(action: action) { actionLabel(image, key) }
             .buttonStyle(.bordered)
+    }
+
+    /// Long translations wrap to a second line instead of being cut off.
+    private func actionLabel(_ image: String, _ key: String) -> some View {
+        Label(tr(key), systemImage: image)
+            .font(.subheadline)
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
+            .minimumScaleFactor(0.85)
+            .frame(maxWidth: .infinity, minHeight: 36)
     }
 
     @ViewBuilder private var photoSection: some View {
@@ -171,7 +181,12 @@ struct FoodSearchView: View {
             Text(tr("favorites_title")).font(.headline)
             ForEach(vm.favorites, id: \.id) { f in
                 HStack(spacing: 12) {
-                    if let photo = vm.favoritePhotos[f.name] { PhotoThumb(name: photo, photos: model.photos) } else { Color.clear.frame(width: 48, height: 48) }
+                    // Room for a photo only when at least one favorite has one, so the names line up.
+                    if let photo = vm.favoritePhotos[f.name] {
+                        PhotoThumb(name: photo, photos: model.photos)
+                    } else if vm.favorites.contains(where: { vm.favoritePhotos[$0.name] != nil }) {
+                        Color.clear.frame(width: 48, height: 48)
+                    }
                     Text(f.name).lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .contentShape(Rectangle())

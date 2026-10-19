@@ -60,7 +60,7 @@ struct EditEstimateSheet: View {
                 Section { Text(tr("edit_grams_hint")).font(.footnote).foregroundStyle(.secondary) }
             }
             .navigationTitle(tr("edit_title"))
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button(tr("action_cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
