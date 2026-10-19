@@ -27,6 +27,8 @@ struct EditEstimateSheet: View {
     var body: some View {
         NavigationStack {
             Form {
+                // The title is a row, not the bar's title: translations are too long to fit between the two buttons.
+                Section { Text(tr("edit_title")).font(.headline) }
                 Section {
                     Picker("", selection: $meal) { ForEach(Meal.allCases, id: \.self) { Text($0.label).tag($0) } }
                         .pickerStyle(.segmented).labelsHidden()
@@ -61,10 +63,6 @@ struct EditEstimateSheet: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Long translations wrap to two lines instead of being cut off between the two buttons.
-                ToolbarItem(placement: .principal) {
-                    Text(tr("edit_title")).font(.headline).multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.7)
-                }
                 ToolbarItem(placement: .cancellationAction) { Button(tr("action_cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(tr("action_add")) { if let r = editor.result { onConfirm(r, favorite) } }
