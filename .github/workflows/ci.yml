@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  core-linux:
+    name: KaloCalcCore (Linux)
+    runs-on: ubuntu-latest
+    container: swift:6.0
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+        working-directory: KaloCalcCore
+
+  app-ios:
+    name: App (iOS simulator)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate the Xcode project
+        run: xcodegen generate
+      - name: Build and test
+        run: |
+          set -o pipefail
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          for runtime, devs in json.load(sys.stdin)['devices'].items():
+              if 'iOS' in runtime:
+                  for d in devs:
+                      if d['name'].startswith('iPhone'):
+                          print(d['udid']); sys.exit()
+          ")
+          xcodebuild test -project KaloCalc.xcodeproj -scheme KaloCalc \
+            -destination "id=$DEVICE" CODE_SIGNING_ALLOWED=NO | tail -n 80

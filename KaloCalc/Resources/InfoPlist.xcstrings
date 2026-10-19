@@ -1,0 +1,108 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "NSCameraUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera is used to photograph food and scan barcodes."
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Камерата се използва за снимане на храна и сканиране на баркодове."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Kamera wird zum Fotografieren von Essen und Scannen von Barcodes verwendet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La cámara se usa para fotografiar comida y escanear códigos de barras."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'appareil photo sert à photographier les aliments et à scanner les codes-barres."
+          }
+        }
+      }
+    },
+    "NSHealthShareUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reads your active calories to adjust the daily goal."
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чете активните ти калории, за да коригира дневната цел."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liest deine aktiven Kalorien, um das Tagesziel anzupassen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lee tus calorías activas para ajustar el objetivo diario."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lit tes calories actives pour ajuster l'objectif quotidien."
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saves the food you log to Apple Health."
+          }
+        },
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Записва храната, която въвеждаш, в Apple Health."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speichert die erfassten Mahlzeiten in Apple Health."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guarda la comida que registras en Apple Health."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistre les aliments saisis dans Apple Santé."
+          }
+        }
+      }
+    }
+  }
+}
