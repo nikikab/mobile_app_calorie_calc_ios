@@ -59,9 +59,12 @@ struct EditEstimateSheet: View {
                 }
                 Section { Text(tr("edit_grams_hint")).font(.footnote).foregroundStyle(.secondary) }
             }
-            .navigationTitle(tr("edit_title"))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                // Long translations wrap to two lines instead of being cut off between the two buttons.
+                ToolbarItem(placement: .principal) {
+                    Text(tr("edit_title")).font(.headline).multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.7)
+                }
                 ToolbarItem(placement: .cancellationAction) { Button(tr("action_cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(tr("action_add")) { if let r = editor.result { onConfirm(r, favorite) } }
