@@ -10,6 +10,11 @@ public struct GeminiDiagnosis {
     public var modelWorks: Bool
     public var modelError: Error?
 
+    public init(models: [String]?, keyError: Error?, model: String, modelWorks: Bool, modelError: Error?) {
+        self.models = models; self.keyError = keyError; self.model = model
+        self.modelWorks = modelWorks; self.modelError = modelError
+    }
+
     /// Flash models first, at most 12, for display.
     public var shownModels: [String] {
         let names = models ?? []
