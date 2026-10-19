@@ -34,8 +34,10 @@ struct PlanSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField(tr("plan_name"), text: $name)
-                        .onChange(of: name) { _, new in if new.count > maxPlanName { name = String(new.prefix(maxPlanName)) } }
+                    LabeledContent(tr("plan_name")) {
+                        TextField("", text: $name).multilineTextAlignment(.trailing)
+                    }
+                    .onChange(of: name) { _, new in if new.count > maxPlanName { name = String(new.prefix(maxPlanName)) } }
                     field(tr("field_calories"), $kcal, suffix: "kcal")
                 }
                 Section {
@@ -59,9 +61,11 @@ struct PlanSheet: View {
     }
 
     private func field(_ label: String, _ text: Binding<String>, suffix: String) -> some View {
-        HStack {
-            TextField(label, text: text).keyboardType(.numberPad).digitsOnly(text)
-            Text(suffix).foregroundStyle(.secondary)
+        LabeledContent(label) {
+            HStack {
+                TextField("", text: text).keyboardType(.numberPad).multilineTextAlignment(.trailing).digitsOnly(text)
+                Text(suffix).foregroundStyle(.secondary)
+            }
         }
     }
 }

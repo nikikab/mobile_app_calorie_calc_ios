@@ -22,9 +22,11 @@ struct TargetSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    HStack {
-                        TextField(tr("field_calories"), text: $text).keyboardType(.numberPad).digitsOnly($text)
-                        Text("kcal").foregroundStyle(.secondary)
+                    LabeledContent(tr("field_calories")) {
+                        HStack {
+                            TextField("", text: $text).keyboardType(.numberPad).multilineTextAlignment(.trailing).digitsOnly($text)
+                            Text("kcal").foregroundStyle(.secondary)
+                        }
                     }
                     Text(tr("diary_target_hint", usual)).font(.footnote).foregroundStyle(.secondary)
                 }

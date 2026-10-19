@@ -19,9 +19,13 @@ shot() {
   local name=$1 lang=$2; shift 2
   xcrun simctl terminate "$DEVICE" "$BUNDLE" 2>/dev/null || true
   xcrun simctl launch "$DEVICE" "$BUNDLE" -demo -AppleLanguages "($lang)" -AppleLocale "$lang" "$@" >/dev/null
-  sleep 4
+  sleep 7
   xcrun simctl io "$DEVICE" screenshot "$OUT/$name-$lang.png"
 }
+
+# The first launch after install is slow; warm it up so no screenshot catches a blank screen.
+xcrun simctl launch "$DEVICE" "$BUNDLE" -demo >/dev/null
+sleep 10
 
 for lang in en bg; do
   shot diary "$lang" -tab diary

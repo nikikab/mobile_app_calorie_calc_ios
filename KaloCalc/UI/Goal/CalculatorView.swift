@@ -24,6 +24,7 @@ struct CalculatorView: View {
                     ForEach(Sex.allCases, id: \.self) { Text($0.label).tag($0) }
                 }
                 .pickerStyle(.segmented)
+                .labelsHidden()
             }
             Section {
                 HStack {
@@ -37,6 +38,7 @@ struct CalculatorView: View {
                     ForEach(ActivityLevel.allCases, id: \.self) { Text($0.label).tag($0) }
                 }
                 .pickerStyle(.menu)
+                .labelsHidden()
             }
             Section(tr("calc_goal")) { goalChoices }
             Section {

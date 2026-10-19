@@ -59,20 +59,18 @@ struct EntryFormSheet: View {
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
-                    TextField(tr("field_name"), text: $name)
-                    TextField(tr("field_grams"), text: $grams)
-                        .keyboardType(.decimalPad)
+                    row(tr("field_name"), $name, keyboard: .default)
+                    row(tr("field_grams"), $grams, keyboard: .decimalPad)
                         .onChange(of: grams) { _, text in rescale(to: text) }
-                    TextField(tr("field_calories"), text: $kcal)
-                        .keyboardType(.numberPad)
+                    row(tr("field_calories"), $kcal, keyboard: .numberPad)
                     if let existing, existing.grams > 0 {
                         Text(tr("edit_grams_hint")).font(.footnote).foregroundStyle(.secondary)
                     }
                 }
                 Section {
-                    TextField(tr("field_protein_short"), text: $protein).keyboardType(.decimalPad)
-                    TextField(tr("field_carbs_short"), text: $carbs).keyboardType(.decimalPad)
-                    TextField(tr("field_fat_short"), text: $fat).keyboardType(.decimalPad)
+                    row(tr("field_protein_short"), $protein, keyboard: .decimalPad)
+                    row(tr("field_carbs_short"), $carbs, keyboard: .decimalPad)
+                    row(tr("field_fat_short"), $fat, keyboard: .decimalPad)
                 }
             }
             .navigationTitle(tr(existing == nil ? "diary_add_food" : "diary_edit_food"))
@@ -93,6 +91,15 @@ struct EntryFormSheet: View {
                     removing = nil
                 }
             }
+        }
+    }
+
+    /// The label stays visible once the field has a value.
+    private func row(_ label: String, _ text: Binding<String>, keyboard: UIKeyboardType) -> some View {
+        LabeledContent(label) {
+            TextField("", text: text)
+                .keyboardType(keyboard)
+                .multilineTextAlignment(.trailing)
         }
     }
 
