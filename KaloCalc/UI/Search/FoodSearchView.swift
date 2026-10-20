@@ -96,7 +96,8 @@ struct FoodSearchView: View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
                 actionButton("camera", "diary_take_photo") { camera = true }
-                    .disabled(!CameraPicker.isAvailable)
+                    // The simulator has no camera; the demo mode used for screenshots shows the button as enabled.
+                    .disabled(!CameraPicker.isAvailable && !ProcessInfo.processInfo.arguments.contains("-demo"))
                 PhotosPicker(selection: $pickedItem, matching: .images) {
                     actionLabel("photo.on.rectangle", "search_pick_photo")
                 }

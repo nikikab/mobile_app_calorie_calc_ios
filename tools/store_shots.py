@@ -7,12 +7,12 @@ import sys
 import cairo
 
 W, H = 1320, 2868
-SCREENS = ["diary", "search", "photo", "progress", "goal", "settings"]
+SCREENS = ["diary", "search", "photo", "progress", "goal", "edit-estimate"]
 CAPTIONS = {
     "en": ["Your day at a glance", "Find any food fast", "Snap a meal, get an estimate",
-           "Watch your progress", "A target made for you", "Your data stays on your phone"],
+           "Watch your progress", "A target made for you", "Fine-tune every estimate"],
     "bg": ["Денят ти накратко", "Намери всяка храна", "Снимай ястие, получи оценка",
-           "Следи напредъка си", "Цел, направена за теб", "Данните остават на телефона"],
+           "Следи напредъка си", "Цел, направена за теб", "Нагласи всяка оценка"],
 }
 FONT = "DejaVu Sans"
 
