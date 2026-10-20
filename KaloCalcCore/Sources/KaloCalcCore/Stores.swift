@@ -83,7 +83,7 @@ public final class ProfileStore {
 
 /// The Gemini key (kept in the secret store), the chosen model and the user's own models.
 public final class SettingsStore {
-    private static let keyKey = "gemini_key", modelKey = "gemini_model", customKey = "gemini_custom_models"
+    private static let keyKey = "gemini_key", modelKey = "gemini_model", customKey = "gemini_custom_models", languageKey = "app_language"
     private let store: KeyValueStore
     private let secrets: SecretStore
     public init(_ store: KeyValueStore, secrets: SecretStore) { self.store = store; self.secrets = secrets }
@@ -94,6 +94,11 @@ public final class SettingsStore {
             model: store.string(Self.modelKey).flatMap(normalizeModelName) ?? defaultGeminiModel,
             customModels: parseCustom(store.string(Self.customKey)))
     }
+
+    /// The language picked in the app, or nil to follow the system.
+    public var language: AppLanguage? { store.string(Self.languageKey).flatMap(AppLanguage.from(code:)) }
+
+    public func saveLanguage(_ language: AppLanguage) { store.set(language.code, for: Self.languageKey) }
 
     public func saveKey(_ key: String) {
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)

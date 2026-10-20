@@ -36,5 +36,7 @@ for lang in en bg; do
   shot diary-target "$lang" -tab diary -sheet target
   shot goal "$lang" -tab goal
   shot goal-plan "$lang" -tab goal -sheet plan
+  shot settings "$lang" -tab settings -sheet report
+  shot settings-model "$lang" -tab settings -sheet model
 done
 ls -l "$OUT"

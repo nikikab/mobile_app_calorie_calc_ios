@@ -91,6 +91,15 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertFalse(s.gemini.enabled)
     }
 
+    func testLanguageFollowsSystemUntilPicked() {
+        let (s, kv, _) = make()
+        XCTAssertNil(s.language)
+        s.saveLanguage(.bg)
+        XCTAssertEqual(s.language, .bg)
+        kv.set("xx", for: "app_language")
+        XCTAssertNil(s.language)
+    }
+
     func testKeyGoesToTheSecretStoreOnly() {
         let (s, kv, secrets) = make()
         s.saveKey("  abc  ")

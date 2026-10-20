@@ -41,6 +41,8 @@ struct RootView: View {
                     .tag(tab)
             }
         }
+        .environment(\.locale, Locale(identifier: model.language.code))
+        .id(model.language)
     }
 
     @ViewBuilder
@@ -49,6 +51,7 @@ struct RootView: View {
         switch tab {
         case .diary: DiaryView(model: model, initialSheet: sheet, onOpenSettings: { selection = .settings })
         case .goal: CalculatorView(model: model, initialSheet: sheet)
+        case .settings: SettingsView(model: model, initialSheet: sheet)
         default: Text(tab.title).navigationTitle(tab.title)
         }
     }

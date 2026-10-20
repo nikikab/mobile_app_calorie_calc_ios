@@ -5,6 +5,19 @@ import Foundation
 /// to change when the language picker overrides the system language.
 enum AppStrings {
     nonisolated(unsafe) static var bundle: Bundle = .main
+    nonisolated(unsafe) private(set) static var language: AppLanguage = systemLanguage
+
+    /// The system language, or English when the app isn't translated into it.
+    static var systemLanguage: AppLanguage {
+        AppLanguage.from(code: Locale.preferredLanguages.first.flatMap { Locale(identifier: $0).language.languageCode?.identifier }) ?? .en
+    }
+
+    /// Switches every string looked up through `text` to `language` (nil follows the system).
+    static func use(_ language: AppLanguage?) {
+        let chosen = language ?? systemLanguage
+        self.language = chosen
+        bundle = Bundle.main.path(forResource: chosen.code, ofType: "lproj").flatMap(Bundle.init(path:)) ?? .main
+    }
 
     static func text(_ key: String, _ args: CVarArg...) -> String { text(key, args: args) }
 

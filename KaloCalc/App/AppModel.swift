@@ -12,6 +12,8 @@ final class AppModel {
     let profileStore: ProfileStore
     let settingsStore: SettingsStore
     let photos: PhotoStore
+    /// The language of the app; changing it redraws every screen.
+    private(set) var language: AppLanguage
 
     init(container: ModelContainer, values: KeyValueStore, secrets: SecretStore, photos: PhotoStore = .shared) {
         self.container = container
@@ -19,6 +21,14 @@ final class AppModel {
         repository = Repository(context: container.mainContext, counters: values)
         profileStore = ProfileStore(values)
         settingsStore = SettingsStore(values, secrets: secrets)
+        AppStrings.use(settingsStore.language)
+        language = AppStrings.language
+    }
+
+    func setLanguage(_ new: AppLanguage) {
+        settingsStore.saveLanguage(new)
+        AppStrings.use(new)
+        language = new
     }
 
     /// The real app: the store on disk, UserDefaults and the Keychain.

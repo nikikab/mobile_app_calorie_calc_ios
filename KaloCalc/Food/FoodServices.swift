@@ -11,8 +11,6 @@ struct FoodServices {
 }
 
 extension AppLanguage {
-    /// The language of the system, or English when the app isn't translated into it.
-    static var current: AppLanguage {
-        AppLanguage.from(code: Locale.current.language.languageCode?.identifier) ?? .en
-    }
+    /// The language picked in Settings, else the system's (English when the app isn't translated into it).
+    static var current: AppLanguage { AppStrings.language }
 }
