@@ -1,4 +1,5 @@
 import Foundation
+import KaloCalcCore
 
 /// Looks up a string from the catalog by its key (the Android resource name) and fills in `%1$lld` / `%1$@` arguments.
 /// Code that has no SwiftUI environment (error messages, notifications) goes through here. `bundle` is the one place
