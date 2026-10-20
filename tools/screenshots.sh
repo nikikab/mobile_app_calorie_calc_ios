@@ -34,6 +34,7 @@ for lang in en bg; do
   shot edit-estimate "$lang" -tab diary -sheet edit
   shot manual "$lang" -tab diary -sheet manual
   shot diary-target "$lang" -tab diary -sheet target
+  shot progress "$lang" -tab progress
   shot goal "$lang" -tab goal
   shot goal-plan "$lang" -tab goal -sheet plan
   shot settings "$lang" -tab settings -sheet report

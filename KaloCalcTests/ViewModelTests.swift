@@ -186,3 +186,45 @@ final class CalculatorViewModelTests: XCTestCase {
         XCTAssertEqual(d.baseKcal, vm.currentTarget)
     }
 }
+
+@MainActor
+final class ProgressViewModelTests: XCTestCase {
+    private let now = Date(timeIntervalSince1970: 1_750_000_000)
+
+    func testLoggingWeightSavesItAndMovesTheProfileWeight() throws {
+        let app = AppModel.inMemory()
+        let vm = ProgressViewModel(model: app, today: { self.now })
+        XCTAssertNil(vm.trend)
+        vm.input = "70,4"
+        vm.logWeight()
+        XCTAssertEqual(vm.trend?.latest, 70.4)
+        XCTAssertEqual(app.profileStore.profile.weightKg, 70.4)
+        XCTAssertEqual(vm.input, "")
+        vm.input = "71"
+        vm.logWeight()
+        XCTAssertEqual(vm.weights.count, 1, "the same day is replaced, not added")
+        XCTAssertEqual(vm.trend?.latest, 71)
+    }
+
+    func testOutOfRangeWeightCannotBeLogged() {
+        let vm = ProgressViewModel(model: .inMemory(), today: { self.now })
+        vm.input = "5"
+        XCTAssertNil(vm.kg)
+        vm.logWeight()
+        XCTAssertTrue(vm.weights.isEmpty)
+    }
+
+    func testWeekShowsDailyTotalsAndTheTarget() throws {
+        let app = AppModel.inMemory()
+        let day = epochDay(of: now)
+        for (back, kcal) in [(0, 500), (0, 700), (3, 1800)] as [(Int, Int)] {
+            _ = try app.repository.insert(FoodEntry(epochDay: day - Int64(back), meal: .lunch, name: "x", kcal: kcal))
+        }
+        let vm = ProgressViewModel(model: app, today: { self.now })
+        XCTAssertEqual(vm.week.count, 7)
+        XCTAssertEqual(vm.week.last?.kcal, 1200)
+        XCTAssertEqual(vm.week[3].kcal, 1800)
+        XCTAssertEqual(vm.average, 1500)
+        XCTAssertEqual(vm.targetKcal, calculate(app.profileStore.profile).target)
+    }
+}

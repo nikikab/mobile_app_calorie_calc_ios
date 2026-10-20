@@ -52,7 +52,7 @@ struct RootView: View {
         case .diary: DiaryView(model: model, initialSheet: sheet, onOpenSettings: { selection = .settings })
         case .goal: CalculatorView(model: model, initialSheet: sheet)
         case .settings: SettingsView(model: model, initialSheet: sheet)
-        default: Text(tab.title).navigationTitle(tab.title)
+        case .progress: ProgressTabView(model: model)
         }
     }
 }

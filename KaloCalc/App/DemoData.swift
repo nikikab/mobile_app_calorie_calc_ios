@@ -23,6 +23,14 @@ extension AppModel {
         for (name, g, k, p, c, f) in [("Greek yogurt", 150.0, 98, 15.0, 6.0, 1.0), ("Oatmeal with banana", 280.0, 310, 9.0, 56.0, 5.0)] {
             try? r.saveFavorite(Favorite(name: name, grams: g, kcal: k, proteinG: p, carbsG: c, fatG: f))
         }
+        // Three weeks of weigh-ins and a week of diary days, for the Progress tab.
+        let kg: [Double] = [66.1, 65.9, 65.8, 65.4, 65.5, 65.0, 64.9, 64.5]
+        for (i, w) in kg.enumerated() { try? r.upsertWeight(WeightEntry(epochDay: day - Int64((kg.count - 1 - i) * 3), kg: w)) }
+        let past = [1: 1720, 2: 2050, 3: 1890, 5: 2240, 6: 1610]
+        for (back, kcal) in past {
+            let d = day - Int64(back)
+            _ = try? r.insert(FoodEntry(epochDay: d, meal: .lunch, name: "Meals", kcal: kcal, epochMillis: entryTimeMillis(epochDay: d, now: today)))
+        }
         return model
     }
 }
