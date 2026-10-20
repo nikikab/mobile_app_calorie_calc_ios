@@ -38,6 +38,7 @@ struct ProgressTabView: View {
                     PointMark(x: .value("Day", day(w.epochDay), unit: .day), y: .value("kg", w.kg))
                 }
                 .chartYScale(domain: weightDomain)
+                .chartXScale(range: .plotDimension(startPadding: 8, endPadding: 24))
                 .frame(height: 160)
                 Text(weightLine(trend)).font(.footnote).foregroundStyle(.secondary)
             } else {
