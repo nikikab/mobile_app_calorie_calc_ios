@@ -27,11 +27,11 @@ jobs:
         run: |
           DEVICE=$(xcrun simctl list devices available -j | python3 -c "
           import json,sys
-          for runtime, devs in json.load(sys.stdin)['devices'].items():
-              if 'iOS' in runtime:
-                  for d in devs:
-                      if d['name'].startswith('iPhone'):
-                          print(d['udid']); sys.exit()
+          # A Pro Max has the 6.9-inch screen (1320x2868) that App Store screenshots are taken on.
+          found = [(d['name'], d['udid']) for runtime, devs in json.load(sys.stdin)['devices'].items()
+                   if 'iOS' in runtime for d in devs if d['name'].startswith('iPhone')]
+          found.sort(key=lambda f: ('Pro Max' not in f[0], f[0]))
+          print(found[0][1])
           ")
           echo "DEVICE=$DEVICE" >> "$GITHUB_ENV"
       - name: Build and test
