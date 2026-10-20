@@ -45,3 +45,29 @@ jobs:
         with:
           name: screenshots
           path: screenshots/*.png
+
+  ipa:
+    name: Unsigned .ipa (device)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate the Xcode project
+        run: xcodegen generate
+      # Built for real devices but not signed: BrowserStack, AltStore and Sideloadly sign it again with their own certificate.
+      - name: Build for device
+        run: |
+          set -o pipefail
+          xcodebuild build -project KaloCalc.xcodeproj -scheme KaloCalc -configuration Release -derivedDataPath build-device \
+            -destination "generic/platform=iOS" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" | tail -n 30
+      - name: Package KaloCalc.ipa
+        run: |
+          mkdir -p ipa/Payload
+          cp -R build-device/Build/Products/Release-iphoneos/KaloCalc.app ipa/Payload/
+          (cd ipa && zip -qry KaloCalc.ipa Payload)
+          unzip -l ipa/KaloCalc.ipa | tail -n 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KaloCalc-ipa
+          path: ipa/KaloCalc.ipa
