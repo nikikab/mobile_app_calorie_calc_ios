@@ -26,6 +26,8 @@ targets:
       path: KaloCalc/Info.plist
       properties:
         CFBundleDisplayName: KaloCalc
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleLocalizations: [en, bg, de, es, fr]
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
