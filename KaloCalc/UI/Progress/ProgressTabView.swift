@@ -27,6 +27,7 @@ struct ProgressTabView: View {
             HStack {
                 TextField(tr("weight_today"), text: $vm.input)
                     .keyboardType(.decimalPad)
+                    .selectAllOnFocus()
                     .textFieldStyle(.roundedBorder)
                 Button(tr("weight_log")) { vm.logWeight() }
                     .buttonStyle(.borderedProminent)

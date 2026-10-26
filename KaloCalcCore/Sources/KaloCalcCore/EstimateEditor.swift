@@ -33,18 +33,20 @@ public struct EstimateEditor: Equatable {
     public init(_ e: FoodEstimate) {
         estimate = e
         name = e.name
-        grams = String(roundHalfUp(e.grams))
-        kcal = String(roundHalfUp(e.kcal))
-        protein = shownNumber(e.proteinG)
-        carbs = shownNumber(e.carbsG)
-        fat = shownNumber(e.fatG)
+        // A dish built from scratch starts with empty fields; they fill in as ingredients are added.
+        let blank = e.grams <= 0
+        grams = blank ? "" : String(roundHalfUp(e.grams))
+        kcal = blank ? "" : String(roundHalfUp(e.kcal))
+        protein = blank ? "" : shownNumber(e.proteinG)
+        carbs = blank ? "" : shownNumber(e.carbsG)
+        fat = blank ? "" : shownNumber(e.fatG)
         items = e.ingredients
         ingredientGrams = e.ingredients.map { String(roundHalfUp($0.grams)) }
     }
 
     public mutating func changeGrams(_ text: String) {
         grams = text
-        guard let g = parseDecimal(text), g > 0 else { return }
+        guard let g = parseDecimal(text), g > 0, estimate.grams > 0 else { return }
         let f = g / estimate.grams
         kcal = String(roundHalfUp(estimate.kcal * f))
         protein = shownNumber(estimate.proteinG * f)

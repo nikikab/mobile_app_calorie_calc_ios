@@ -24,7 +24,7 @@ struct TargetSheet: View {
                 Section {
                     LabeledContent(tr("field_calories")) {
                         HStack {
-                            TextField("", text: $text).keyboardType(.numberPad).multilineTextAlignment(.trailing).digitsOnly($text)
+                            TextField("", text: $text).keyboardType(.numberPad).multilineTextAlignment(.trailing).digitsOnly($text).selectAllOnFocus()
                             Text("kcal").foregroundStyle(.secondary)
                         }
                     }

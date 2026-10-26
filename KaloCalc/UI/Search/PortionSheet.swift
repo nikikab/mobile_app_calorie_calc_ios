@@ -5,10 +5,11 @@ import KaloCalcCore
 struct PortionSheet: View {
     let product: Product
     let onDismiss: () -> Void
-    let onConfirm: (Double) -> Void
+    let onConfirm: (Double, Bool) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var grams = "100"
+    @State private var favorite = false
 
     private var value: Double? { parseDecimal(grams).flatMap { $0 > 0 ? $0 : nil } }
 
@@ -17,12 +18,13 @@ struct PortionSheet: View {
             Form {
                 Section {
                     LabeledContent(tr("field_grams")) {
-                        TextField("", text: $grams).keyboardType(.decimalPad).multilineTextAlignment(.trailing)
+                        TextField("", text: $grams).keyboardType(.decimalPad).multilineTextAlignment(.trailing).selectAllOnFocus()
                     }
                     if let g = value {
                         let p = product.portion(grams: g)
                         Text(tr("portion_line", p.kcal) + " · " + tr("macro_short", roundHalfUp(p.proteinG), roundHalfUp(p.carbsG), roundHalfUp(p.fatG)))
                     }
+                    Toggle(tr("favorite_save"), isOn: $favorite)
                 }
             }
             .navigationTitle(product.name)
@@ -30,7 +32,7 @@ struct PortionSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button(tr("action_cancel")) { onDismiss(); dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(tr("action_add")) { if let g = value { onConfirm(g) } }.disabled(value == nil)
+                    Button(tr("action_add")) { if let g = value { onConfirm(g, favorite) } }.disabled(value == nil)
                 }
             }
         }

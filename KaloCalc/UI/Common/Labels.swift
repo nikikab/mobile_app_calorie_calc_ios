@@ -42,3 +42,16 @@ extension Goal {
         }
     }
 }
+
+extension MeasureUnit {
+    var label: String {
+        switch self {
+        case .g: tr("unit_g")
+        case .ml: tr("unit_ml")
+        case .tbsp: tr("unit_tbsp")
+        case .tsp: tr("unit_tsp")
+        case .cup: tr("unit_cup")
+        case .piece: tr("unit_piece")
+        }
+    }
+}

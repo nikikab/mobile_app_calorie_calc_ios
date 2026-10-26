@@ -250,9 +250,43 @@ final class DiaryPhotoTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: model.photos.url(for: names[1]).path))
     }
 
+    func testKeepingThePendingPhotoLetsTheNextDishUseItToo() throws {
+        let model = AppModel.inMemory()
+        let vm = DiaryViewModel(model: model)
+        let pending = try model.photos.importPending(testImage())
+        let values = { (n: String) in EntryValues(meal: .lunch, name: n, grams: 0, kcal: 10, proteinG: 0, carbsG: 0, fatG: 0) }
+        vm.add(values("A"), pendingPhoto: pending.path, keepPhoto: true)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: pending.path))
+        vm.add(values("B"), pendingPhoto: pending.path, keepPhoto: true)
+        let names = vm.entries.compactMap(\.photoPath)
+        XCTAssertEqual(Set(names).count, 2)
+    }
+
     func testEntryWithoutAPhotoStaysWithout() {
         let vm = DiaryViewModel(model: .inMemory())
         vm.add(EntryValues(meal: .snack, name: "Tea", grams: 0, kcal: 1, proteinG: 0, carbsG: 0, fatG: 0))
         XCTAssertNil(vm.entries[0].photoPath)
+    }
+}
+
+@MainActor
+final class EstimateListTests: XCTestCase {
+    func testCorrectingADishReplacesOnlyThatOneInTheList() {
+        let vm = FoodSearchViewModel(model: .inMemory())
+        vm.loadDemo("photo")
+        let first = vm.estimates[0], second = vm.estimates[1]
+        var changed = first
+        changed.kcal = 400
+        vm.replaceEstimate(first, with: changed)
+        XCTAssertEqual(vm.estimates, [changed, second])
+    }
+
+    func testStarSavesTheDishAsAFavorite() {
+        let vm = FoodSearchViewModel(model: .inMemory())
+        vm.loadDemo("photo")
+        vm.saveFavorite(vm.estimates[0])
+        XCTAssertEqual(vm.favorites.map(\.name), ["Chicken salad"])
+        vm.removeFavorite(vm.favorites[0])
+        XCTAssertTrue(vm.favorites.isEmpty)
     }
 }

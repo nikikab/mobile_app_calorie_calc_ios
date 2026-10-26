@@ -99,6 +99,11 @@ final class FoodSearchViewModel {
         message = found.isEmpty ? tr("search_gemini_no_food") : nil
     }
 
+    /// Shows a dish as the user corrected it, in place of the recognized one.
+    func replaceEstimate(_ original: FoodEstimate, with changed: FoodEstimate) {
+        estimates = estimates.map { $0 == original ? changed : $0 }
+    }
+
     func clearPhoto() {
         pendingPhoto = nil; photoLabels = []; estimates = []; message = nil
     }
@@ -106,6 +111,7 @@ final class FoodSearchViewModel {
     /// Forgets the last search, so the screen opens empty next time. Favorites and photos of past entries are kept.
     func reset() {
         task?.cancel()
+        model.photos.discardPending(pendingPhoto)
         results = []; loading = false; message = nil; scanned = nil
         pendingPhoto = nil; photoLabels = []; estimates = []
     }

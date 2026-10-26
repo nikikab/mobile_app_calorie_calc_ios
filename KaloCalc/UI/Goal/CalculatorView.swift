@@ -75,7 +75,7 @@ struct CalculatorView: View {
     private func numberField(_ label: String, _ text: Binding<String>, decimal: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label).font(.caption).foregroundStyle(.secondary)
-            TextField(label, text: text).keyboardType(decimal ? .decimalPad : .numberPad)
+            TextField(label, text: text).keyboardType(decimal ? .decimalPad : .numberPad).selectAllOnFocus()
         }
     }
 

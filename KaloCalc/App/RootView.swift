@@ -1,8 +1,11 @@
 import SwiftUI
 
-/// The four tabs of the app, in the same order as on Android.
+import KaloCalcCore
+
+/// The tabs of the app, in the same order as on Android. Help is not a real tab: picking it opens the how-to guide in
+/// the browser and leaves the current tab as it was.
 enum AppTab: String, CaseIterable {
-    case diary, progress, goal, settings
+    case diary, progress, goal, settings, help
 
     var title: String {
         switch self {
@@ -10,6 +13,7 @@ enum AppTab: String, CaseIterable {
         case .progress: tr("tab_progress")
         case .goal: tr("tab_goal")
         case .settings: tr("tab_settings")
+        case .help: tr("tab_help")
         }
     }
 
@@ -19,6 +23,7 @@ enum AppTab: String, CaseIterable {
         case .progress: "chart.xyaxis.line"
         case .goal: "function"
         case .settings: "gearshape"
+        case .help: "questionmark.circle"
         }
     }
 }
@@ -26,6 +31,7 @@ enum AppTab: String, CaseIterable {
 struct RootView: View {
     let model: AppModel
     @State private var selection: AppTab
+    @Environment(\.openURL) private var openURL
 
     /// `-tab goal` and `-sheet entry` (launch arguments) open a given tab and dialog, for screenshots.
     init(model: AppModel) {
@@ -41,6 +47,11 @@ struct RootView: View {
                     .tag(tab)
             }
         }
+        .onChange(of: selection) { old, new in
+            guard new == .help else { return }
+            selection = old
+            if let url = URL(string: model.language.helpUrl()) { openURL(url) }
+        }
         .environment(\.locale, Locale(identifier: model.language.code))
         .id(model.language)
     }
@@ -53,6 +64,7 @@ struct RootView: View {
         case .goal: CalculatorView(model: model, initialSheet: sheet)
         case .settings: SettingsView(model: model, initialSheet: sheet)
         case .progress: ProgressTabView(model: model)
+        case .help: Color.clear
         }
     }
 }

@@ -23,7 +23,26 @@ struct LabeledBar: View {
     }
 }
 
+/// Text fields marked with `selectAllOnFocus()` select their whole value when they gain focus, so a number can be typed over.
+/// SwiftUI has no API for it: the field's identifier lets one app-wide observer find the UITextField behind it.
+enum SelectAll {
+    static let identifier = "kalocalc.selectAllOnFocus"
+    nonisolated(unsafe) private static var installed = false
+
+    static func install() {
+        guard !installed else { return }
+        installed = true
+        NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: nil, queue: .main) { note in
+            guard let field = note.object as? UITextField, field.accessibilityIdentifier == identifier else { return }
+            // The tap that gave focus also places the cursor, so select after it has landed.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { field.selectAll(nil) }
+        }
+    }
+}
+
 extension View {
+    func selectAllOnFocus() -> some View { accessibilityIdentifier(SelectAll.identifier) }
+
     /// Keeps a text field to digits, at most `limit` of them.
     func digitsOnly(_ text: Binding<String>, limit: Int = 5) -> some View {
         onChange(of: text.wrappedValue) { _, new in

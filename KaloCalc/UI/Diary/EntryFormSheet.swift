@@ -6,6 +6,10 @@ struct EntryFormSheet: View {
     let existing: FoodEntry?
     let favorites: [Favorite]
     let onRemoveFavorite: (Favorite) -> Void
+    /// When set (adding from the search screen), a checkbox offers to also save the dish to favorites.
+    var onSaveFavorite: ((FoodEstimate) -> Void)?
+    /// When set, a button switches to building the dish from ingredients.
+    var onRecipe: (() -> Void)?
     let onConfirm: (EntryValues) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -17,12 +21,16 @@ struct EntryFormSheet: View {
     @State private var carbs: String
     @State private var fat: String
     @State private var removing: Favorite?
+    @State private var favorite = false
 
     init(existing: FoodEntry?, favorites: [Favorite], onRemoveFavorite: @escaping (Favorite) -> Void,
+         onSaveFavorite: ((FoodEstimate) -> Void)? = nil, onRecipe: (() -> Void)? = nil,
          onConfirm: @escaping (EntryValues) -> Void) {
         self.existing = existing
         self.favorites = favorites
         self.onRemoveFavorite = onRemoveFavorite
+        self.onSaveFavorite = onSaveFavorite
+        self.onRecipe = onRecipe
         self.onConfirm = onConfirm
         _meal = State(initialValue: existing?.meal ?? Meal.now())
         _name = State(initialValue: existing?.name ?? "")
@@ -33,6 +41,8 @@ struct EntryFormSheet: View {
         _fat = State(initialValue: existing.map { gramsText($0.fatG) } ?? "")
     }
 
+    private var canSaveFavorite: Bool { (parseDecimal(grams) ?? 0) > 0 }
+
     private var values: EntryValues? {
         parseEntryInput(meal: meal, name: name, grams: grams, kcal: kcal, protein: protein, carbs: carbs, fat: fat)
     }
@@ -40,6 +50,9 @@ struct EntryFormSheet: View {
     var body: some View {
         NavigationStack {
             Form {
+                if existing == nil, let onRecipe {
+                    Section { Button(tr("recipe_build")) { onRecipe() } }
+                }
                 if existing == nil && !favorites.isEmpty {
                     Section(tr("favorites_title")) {
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -72,6 +85,10 @@ struct EntryFormSheet: View {
                     row(tr("field_carbs_short"), $carbs, keyboard: .decimalPad)
                     row(tr("field_fat_short"), $fat, keyboard: .decimalPad)
                 }
+                // A favorite is added again with its saved grams, so it needs a weight.
+                if existing == nil && onSaveFavorite != nil {
+                    Section { Toggle(tr("favorite_save"), isOn: $favorite).disabled(!canSaveFavorite) }
+                }
             }
             .navigationTitle(tr(existing == nil ? "diary_add_food" : "diary_edit_food"))
             .navigationBarTitleDisplayMode(.inline)
@@ -79,7 +96,14 @@ struct EntryFormSheet: View {
                 ToolbarItem(placement: .cancellationAction) { Button(tr("action_cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(tr(existing == nil ? "action_add" : "action_save")) {
-                        if let values { onConfirm(values); dismiss() }
+                        if let values {
+                            if favorite && canSaveFavorite {
+                                onSaveFavorite?(FoodEstimate(name: values.name, grams: values.grams, kcal: Double(values.kcal),
+                                                             proteinG: values.proteinG, carbsG: values.carbsG, fatG: values.fatG))
+                            }
+                            onConfirm(values)
+                            dismiss()
+                        }
                     }
                     .disabled(values == nil)
                 }
@@ -100,6 +124,7 @@ struct EntryFormSheet: View {
             TextField("", text: text)
                 .keyboardType(keyboard)
                 .multilineTextAlignment(.trailing)
+                .selectAllOnFocus()
         }
     }
 

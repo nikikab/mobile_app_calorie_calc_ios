@@ -34,6 +34,17 @@ public enum AppLanguage: String, CaseIterable {
     }
 
     public static func from(code: String?) -> AppLanguage? { allCases.first { $0.code == code } }
+
+    private static let helpBase = "https://nikikab.github.io/mobile_app_calorie_calc_howto"
+    /// Languages the how-to site has a translation for; English is the default (the site root, and docs/en).
+    private static let helpTranslated: Set<AppLanguage> = [.bg, .de, .fr, .es]
+
+    /// The how-to guide in this language, or one of its pages; languages without a translated guide open the English one.
+    public func helpUrl(scenario: String? = nil) -> String {
+        let translated = Self.helpTranslated.contains(self)
+        guard let scenario else { return translated ? "\(Self.helpBase)/README.\(code)" : "\(Self.helpBase)/" }
+        return "\(Self.helpBase)/docs/\(translated ? code : "en")/\(scenario)"
+    }
 }
 
 public let defaultGeminiModel = "gemini-3.5-flash-lite"

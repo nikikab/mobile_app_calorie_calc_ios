@@ -45,6 +45,9 @@ struct SettingsView: View {
                 Button(tr("settings_get_key")) {
                     if let url = URL(string: "https://aistudio.google.com/apikey") { openURL(url) }
                 }
+                Button(tr("settings_help")) {
+                    if let url = URL(string: model.language.helpUrl(scenario: "10-language-and-settings")) { openURL(url) }
+                }
             } header: {
                 Text(tr("settings_gemini_heading"))
             }

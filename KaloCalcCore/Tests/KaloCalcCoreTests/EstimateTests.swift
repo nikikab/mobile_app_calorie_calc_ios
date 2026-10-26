@@ -136,3 +136,18 @@ final class EstimateEditorTests: XCTestCase {
         XCTAssertEqual(r.ingredients.map(\.name), ["Ориз"])
     }
 }
+
+final class RecipeEditorTests: XCTestCase {
+    func testADishBuiltFromNothingFillsInFromItsIngredients() {
+        var e = EstimateEditor(FoodEstimate(name: "", grams: 0, kcal: 0, proteinG: 0, carbsG: 0, fatG: 0))
+        XCTAssertEqual(e.grams, "")
+        e.changeGrams("200")
+        XCTAssertEqual(e.kcal, "", "nothing to scale from, so the calories are left alone")
+        e.addIngredient(Ingredient(name: "Oil", grams: 15, kcal: 130, proteinG: 0, carbsG: 0, fatG: 15))
+        e.addIngredient(Ingredient(name: "Rice", grams: 100, kcal: 130, proteinG: 2.5, carbsG: 28, fatG: 0.3))
+        XCTAssertEqual(e.grams, "115")
+        XCTAssertEqual(e.kcal, "260")
+        e.name = "Rice with oil"
+        XCTAssertEqual(e.result?.ingredients.count, 2)
+    }
+}

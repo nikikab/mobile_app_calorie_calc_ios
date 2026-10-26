@@ -42,9 +42,10 @@ final class DiaryViewModel {
     }
 
     /// `pendingPhoto` is the photo that was taken for this dish, if any; it is stored with the entry.
-    func add(_ v: EntryValues, pendingPhoto: String? = nil) {
+    /// With `keepPhoto` the pending photo stays for the next dish of the same picture.
+    func add(_ v: EntryValues, pendingPhoto: String? = nil, keepPhoto: Bool = false) {
         perform {
-            let photo = try model.photos.commitPending(pendingPhoto)
+            let photo = try model.photos.commitPending(pendingPhoto, keepPending: keepPhoto)
             try model.repository.insert(FoodEntry(
                 epochDay: day, meal: v.meal, name: v.name, kcal: v.kcal, proteinG: v.proteinG, carbsG: v.carbsG, fatG: v.fatG,
                 photoPath: photo, epochMillis: entryTimeMillis(epochDay: day), grams: v.grams))

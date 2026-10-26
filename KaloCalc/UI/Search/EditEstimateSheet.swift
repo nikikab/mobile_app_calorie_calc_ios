@@ -6,6 +6,10 @@ struct EditEstimateSheet: View {
     let estimate: FoodEstimate
     @Binding var meal: Meal
     let canSaveFavorite: Bool
+    /// Key of the confirm button's text: "Add" by default, "Change" when the dish is only corrected in the list.
+    var confirmKey = "action_add"
+    /// Starting from nothing: a dish built from ingredients, so the ingredient list is shown even while empty.
+    var recipe = false
     let search: (String) async throws -> [Product]
     let onConfirm: (EstimateResult, Bool) -> Void
 
@@ -14,11 +18,13 @@ struct EditEstimateSheet: View {
     @State private var favorite = false
     @State private var addingIngredient = false
 
-    init(estimate: FoodEstimate, meal: Binding<Meal>, canSaveFavorite: Bool,
+    init(estimate: FoodEstimate, meal: Binding<Meal>, canSaveFavorite: Bool, confirmKey: String = "action_add", recipe: Bool = false,
          search: @escaping (String) async throws -> [Product], onConfirm: @escaping (EstimateResult, Bool) -> Void) {
         self.estimate = estimate
         _meal = meal
         self.canSaveFavorite = canSaveFavorite
+        self.confirmKey = confirmKey
+        self.recipe = recipe
         self.search = search
         self.onConfirm = onConfirm
         _editor = State(initialValue: EstimateEditor(estimate))
@@ -28,7 +34,7 @@ struct EditEstimateSheet: View {
         NavigationStack {
             Form {
                 // The title is a row, not the bar's title: translations are too long to fit between the two buttons.
-                Section { Text(tr("edit_title")).font(.headline) }
+                Section { Text(tr(recipe ? "recipe_title" : "edit_title")).font(.headline) }
                 Section {
                     Picker("", selection: $meal) { ForEach(Meal.allCases, id: \.self) { Text($0.label).tag($0) } }
                         .pickerStyle(.segmented).labelsHidden()
@@ -41,13 +47,13 @@ struct EditEstimateSheet: View {
                     row(tr("field_carbs_short"), $editor.carbs, .decimalPad)
                     row(tr("field_fat_short"), $editor.fat, .decimalPad)
                 }
-                if !estimate.ingredients.isEmpty {
+                if recipe || !estimate.ingredients.isEmpty {
                     Section(tr("ingredients_title")) {
                         ForEach(editor.items.indices, id: \.self) { i in
                             HStack {
                                 Text(editor.items[i].name).frame(maxWidth: .infinity, alignment: .leading)
                                 TextField(tr("field_grams"), text: Binding(get: { editor.ingredientGrams[i] }, set: { editor.changeIngredientGrams(i, $0) }))
-                                    .keyboardType(.decimalPad).multilineTextAlignment(.trailing).frame(width: 70)
+                                    .keyboardType(.decimalPad).multilineTextAlignment(.trailing).frame(width: 70).selectAllOnFocus()
                                 Button { editor.removeIngredient(i) } label: { Image(systemName: "trash") }
                                     .buttonStyle(.borderless)
                                     .accessibilityLabel(tr("ingredient_remove"))
@@ -59,13 +65,15 @@ struct EditEstimateSheet: View {
                 if canSaveFavorite {
                     Section { Toggle(tr("favorite_save"), isOn: $favorite) }
                 }
-                Section { Text(tr("edit_grams_hint")).font(.footnote).foregroundStyle(.secondary) }
+                if !recipe {
+                    Section { Text(tr("edit_grams_hint")).font(.footnote).foregroundStyle(.secondary) }
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button(tr("action_cancel")) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(tr("action_add")) { if let r = editor.result { onConfirm(r, favorite) } }
+                    Button(tr(confirmKey)) { if let r = editor.result { onConfirm(r, favorite) } }
                         .disabled(editor.result == nil)
                         .tint(addGreen)
                 }
@@ -77,7 +85,7 @@ struct EditEstimateSheet: View {
     }
 
     private func row(_ label: String, _ text: Binding<String>, _ keyboard: UIKeyboardType) -> some View {
-        LabeledContent(label) { TextField("", text: text).keyboardType(keyboard).multilineTextAlignment(.trailing) }
+        LabeledContent(label) { TextField("", text: text).keyboardType(keyboard).multilineTextAlignment(.trailing).selectAllOnFocus() }
     }
 }
 
@@ -99,6 +107,9 @@ struct AddIngredientSheet: View {
     @State private var protein = ""
     @State private var carbs = ""
     @State private var fat = ""
+    @State private var amount = ""
+    @State private var unit = MeasureUnit.g
+    @State private var pieceGrams = "50"
 
     private var gramsValue: Double? { parseDecimal(grams).flatMap { $0 > 0 ? $0 : nil } }
     private var kcalValue: Double? { parseDecimal(kcal).flatMap { $0 >= 0 ? $0 : nil } }
@@ -130,6 +141,19 @@ struct AddIngredientSheet: View {
                 }
                 Section {
                     row(tr("field_name"), $name, .default)
+                    row(tr("field_amount"), Binding(get: { amount }, set: { amount = $0; applyAmount() }), .numbersAndPunctuation)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(MeasureUnit.allCases, id: \.self) { u in
+                                Button(u.label) { unit = u; applyAmount() }
+                                    .buttonStyle(.borderedProminent).tint(u == unit ? addGreen : .gray.opacity(0.35))
+                                    .foregroundStyle(u == unit ? Color.white : Color.primary)
+                            }
+                        }
+                    }
+                    if unit == .piece {
+                        row(tr("field_piece_grams"), Binding(get: { pieceGrams }, set: { pieceGrams = $0; applyAmount() }), .decimalPad)
+                    }
                     row(tr("field_grams"), Binding(get: { grams }, set: changeGrams), .decimalPad)
                     row(tr("field_calories"), $kcal, .decimalPad)
                     row(tr("field_protein_short"), $protein, .decimalPad)
@@ -157,7 +181,7 @@ struct AddIngredientSheet: View {
     }
 
     private func row(_ label: String, _ text: Binding<String>, _ keyboard: UIKeyboardType) -> some View {
-        LabeledContent(label) { TextField("", text: text).keyboardType(keyboard).multilineTextAlignment(.trailing) }
+        LabeledContent(label) { TextField("", text: text).keyboardType(keyboard).multilineTextAlignment(.trailing).selectAllOnFocus() }
     }
 
     /// Fills the nutrition fields for `g` grams of `p`.
@@ -167,6 +191,13 @@ struct AddIngredientSheet: View {
         protein = shownNumber(p.protein100 * f)
         carbs = shownNumber(p.carbs100 * f)
         fat = shownNumber(p.fat100 * f)
+    }
+
+    /// Turns "1/2 tbsp" and the like into grams, and the nutrition with it.
+    private func applyAmount() {
+        guard let g = gramsFor(parseAmount(amount), unit, pieceGrams: parseDecimal(pieceGrams)), g > 0 else { return }
+        grams = shownNumber(g)
+        if let p = product { fill(from: p, grams: g) }
     }
 
     private func changeGrams(_ text: String) {

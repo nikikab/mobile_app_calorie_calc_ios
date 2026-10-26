@@ -6,10 +6,11 @@ let addGreen = Color(red: 0.122, green: 0.541, blue: 0.298)
 let editYellow = Color(red: 1.0, green: 0.788, blue: 0.235)
 
 private enum SearchSheet: Identifiable {
-    case manual, edit(FoodEstimate), portion(Product)
+    case manual, recipe, edit(FoodEstimate), portion(Product)
     var id: String {
         switch self {
         case .manual: "manual"
+        case .recipe: "recipe"
         case .edit(let e): "edit-\(e.name)"
         case .portion(let p): "portion-\(p.name)-\(p.brand)"
         }
@@ -171,7 +172,9 @@ struct FoodSearchView: View {
             }
             ForEach(vm.estimates.indices, id: \.self) { i in
                 let e = vm.estimates[i]
-                EstimateCard(estimate: e, onAdd: { add(e) }, onEdit: { sheet = .edit(e) })
+                let saved = vm.favorites.first { $0.name == e.name }
+                EstimateCard(estimate: e, onAdd: { addEstimate(e) }, onEdit: { sheet = .edit(e) }, favorite: saved != nil,
+                             onFavorite: { if let saved { vm.removeFavorite(saved) } else { vm.saveFavorite(e) } })
             }
         }
     }
@@ -216,12 +219,14 @@ struct FoodSearchView: View {
     @ViewBuilder private func sheetContent(_ which: SearchSheet) -> some View {
         switch which {
         case .manual:
-            EntryFormSheet(existing: nil, favorites: [], onRemoveFavorite: { _ in }) { v in
+            EntryFormSheet(existing: nil, favorites: [], onRemoveFavorite: { _ in }, onSaveFavorite: vm.saveFavorite,
+                           onRecipe: { sheet = .recipe }) { v in
                 diary.add(v, pendingPhoto: vm.pendingPhoto)
                 dismiss()
             }
-        case .edit(let estimate):
-            EditEstimateSheet(estimate: estimate, meal: $meal, canSaveFavorite: true, search: vm.searchIngredients) { result, favorite in
+        case .recipe:
+            EditEstimateSheet(estimate: FoodEstimate(name: "", grams: 0, kcal: 0, proteinG: 0, carbsG: 0, fatG: 0), meal: $meal,
+                              canSaveFavorite: true, recipe: true, search: vm.searchIngredients) { result, favorite in
                 if favorite {
                     vm.saveFavorite(FoodEstimate(name: result.name, grams: result.grams, kcal: Double(result.kcal), proteinG: result.proteinG,
                                                  carbsG: result.carbsG, fatG: result.fatG, ingredients: result.ingredients))
@@ -230,15 +235,35 @@ struct FoodSearchView: View {
                                       proteinG: result.proteinG, carbsG: result.carbsG, fatG: result.fatG), pendingPhoto: vm.pendingPhoto)
                 dismiss()
             }
+        case .edit(let estimate):
+            // Only corrects the dish in the list; it is added to the diary with its own Add button.
+            EditEstimateSheet(estimate: estimate, meal: $meal, canSaveFavorite: false, confirmKey: "action_change",
+                              search: vm.searchIngredients) { result, _ in
+                vm.replaceEstimate(estimate, with: FoodEstimate(name: result.name, grams: result.grams, kcal: Double(result.kcal),
+                                                                proteinG: result.proteinG, carbsG: result.carbsG, fatG: result.fatG,
+                                                                ingredients: result.ingredients))
+                sheet = nil
+            }
         case .portion(let product):
-            PortionSheet(product: product, onDismiss: { vm.scanned = nil }) { grams in
+            PortionSheet(product: product, onDismiss: { vm.scanned = nil }) { grams, favorite in
                 let p = product.portion(grams: grams)
+                if favorite {
+                    let f = grams / 100
+                    vm.saveFavorite(FoodEstimate(name: product.name, grams: grams, kcal: product.kcal100 * f, proteinG: product.protein100 * f,
+                                                 carbsG: product.carbs100 * f, fatG: product.fat100 * f))
+                }
                 diary.add(EntryValues(meal: meal, name: product.name, grams: grams, kcal: p.kcal,
                                       proteinG: p.proteinG, carbsG: p.carbsG, fatG: p.fatG), pendingPhoto: vm.pendingPhoto)
                 vm.scanned = nil
                 dismiss()
             }
         }
+    }
+
+    /// Adds one recognized dish; it stays listed and the photo is kept, so the other dishes can still be added.
+    private func addEstimate(_ e: FoodEstimate) {
+        diary.add(EntryValues(meal: meal, name: e.name, grams: e.grams, kcal: roundedKcal(e), proteinG: e.proteinG, carbsG: e.carbsG, fatG: e.fatG),
+                  pendingPhoto: vm.pendingPhoto, keepPhoto: true)
     }
 
     private func add(_ e: FoodEstimate) {
@@ -255,9 +280,13 @@ private struct EstimateCard: View {
     let estimate: FoodEstimate
     let onAdd: () -> Void
     let onEdit: () -> Void
+    /// Whether the dish is saved in favorites; the star in the corner saves it (gold) or removes it again (grey).
+    let favorite: Bool
+    let onFavorite: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(estimate.name)
                 Text(tr("estimate_line", roundHalfUp(estimate.grams), roundHalfUp(estimate.kcal)) + " · "
@@ -268,6 +297,13 @@ private struct EstimateCard: View {
                         Text(tr("ingredient_line", estimate.ingredients[i].name, roundHalfUp(estimate.ingredients[i].grams))).font(.footnote)
                     }
                 }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+                Button(action: onFavorite) {
+                    Image(systemName: "star.fill").foregroundStyle(favorite ? Color(red: 0.949, green: 0.714, blue: 0) : Color(.systemGray3))
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel(tr(favorite ? "favorite_saved" : "favorite_save"))
             }
             HStack(spacing: 8) {
                 // Green: add as is. Yellow: change it first.
