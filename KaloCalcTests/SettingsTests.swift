@@ -17,11 +17,17 @@ final class SettingsViewModelTests: XCTestCase {
         vm.key = "  \(goodKey) "
         XCTAssertTrue(vm.dirty)
         vm.saveKey()
+        XCTAssertTrue(vm.askingConsent, "a new key is only saved after the user agrees to what is sent to Gemini")
+        XCTAssertFalse(app.settingsStore.gemini.enabled)
+        vm.confirmConsent()
+        XCTAssertFalse(vm.askingConsent)
+        XCTAssertTrue(app.settingsStore.geminiConsent)
         XCTAssertEqual(app.settingsStore.gemini.apiKey, goodKey)
         XCTAssertEqual(vm.key, goodKey)
         XCTAssertFalse(vm.dirty)
         vm.clearKey()
         XCTAssertFalse(app.settingsStore.gemini.enabled)
+        XCTAssertFalse(app.settingsStore.geminiConsent)
         XCTAssertFalse(vm.canClear)
     }
 

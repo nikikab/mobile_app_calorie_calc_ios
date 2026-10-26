@@ -59,6 +59,12 @@ struct SettingsView: View {
         .fullScreenCover(isPresented: $scanning) {
             BarcodeScanner(formats: [.qr]) { vm.scanned($0) }
         }
+        .alert(tr("consent_title"), isPresented: $vm.askingConsent) {
+            Button(tr("consent_agree")) { vm.confirmConsent() }
+            Button(tr("consent_decline"), role: .cancel) {}
+        } message: {
+            Text(tr("consent_message"))
+        }
         .sheet(isPresented: $addingModel) {
             AddModelSheet(existing: vm.gemini.allModels) { vm.addModel($0) }
         }

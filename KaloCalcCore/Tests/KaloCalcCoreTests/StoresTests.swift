@@ -137,3 +137,24 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(s.gemini.model, presetGeminiModels[1])
     }
 }
+
+final class GeminiConsentTests: XCTestCase {
+    func testNothingIsSentWithoutAgreementEvenWithAKey() {
+        let s = SettingsStore(MemoryKeyValueStore(), secrets: MemoryKeyValueStore())
+        s.saveKey("abc-key")
+        XCTAssertTrue(s.gemini.enabled)
+        XCTAssertFalse(s.geminiConsent)
+        XCTAssertFalse(s.geminiForSending.enabled)
+        s.saveGeminiConsent(true)
+        XCTAssertTrue(s.geminiForSending.enabled)
+        XCTAssertEqual(s.geminiForSending.apiKey, "abc-key")
+    }
+
+    func testClearingTheKeyTakesTheAgreementBack() {
+        let s = SettingsStore(MemoryKeyValueStore(), secrets: MemoryKeyValueStore())
+        s.saveKey("abc-key")
+        s.saveGeminiConsent(true)
+        s.saveKey("  ")
+        XCTAssertFalse(s.geminiConsent)
+    }
+}

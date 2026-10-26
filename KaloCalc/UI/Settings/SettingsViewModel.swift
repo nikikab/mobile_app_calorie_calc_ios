@@ -15,6 +15,8 @@ final class SettingsViewModel {
     private(set) var scanInvalid = false
     private(set) var testing = false
     private(set) var testResult: String?
+    /// Set when a new key is about to be saved: the user must first agree to photos and search text going to Gemini.
+    var askingConsent = false
 
     init(model: AppModel, transport: HTTPTransport = URLSessionTransport()) {
         self.model = model
@@ -29,9 +31,24 @@ final class SettingsViewModel {
     var canTest: Bool { !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !testing }
 
     func saveKey() {
+        let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty && !model.settingsStore.geminiConsent {
+            askingConsent = true
+            return
+        }
+        store(trimmed)
+    }
+
+    func confirmConsent() {
+        model.settingsStore.saveGeminiConsent(true)
+        askingConsent = false
+        store(key)
+    }
+
+    private func store(_ key: String) {
         model.settingsStore.saveKey(key)
         refresh()
-        key = gemini.apiKey
+        self.key = gemini.apiKey
     }
 
     func clearKey() {
@@ -74,6 +91,7 @@ final class SettingsViewModel {
     /// Fills in a report without going to the network, for screenshots.
     func loadDemo() {
         key = "AIzaSyDemoKeyDemoKeyDemoKey0123456"
+        model.settingsStore.saveGeminiConsent(true)
         saveKey()
         testResult = report(for: GeminiDiagnosis(models: ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3-pro"],
                                                  keyError: nil, model: gemini.model, modelWorks: true, modelError: nil))

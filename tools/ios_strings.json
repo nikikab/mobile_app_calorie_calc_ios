@@ -5,5 +5,33 @@
     "de": "Auf diesem Gerät ist keine Kamera verfügbar.",
     "es": "No hay ninguna cámara disponible en este dispositivo.",
     "fr": "Aucun appareil photo n'est disponible sur cet appareil."
+  },
+  "consent_title": {
+    "en": "Send to Google Gemini?",
+    "bg": "Да се изпрати ли на Google Gemini?",
+    "de": "An Google Gemini senden?",
+    "es": "¿Enviar a Google Gemini?",
+    "fr": "Envoyer à Google Gemini ?"
+  },
+  "consent_message": {
+    "en": "To estimate food from a photo, KaloCalc sends a reduced-size copy of the photo to Google's Gemini service, using your API key. To translate food searches, it can also send the search text and the names of the products found. Nothing else is sent. Google processes this under its own terms. You can remove your key in Settings at any time.",
+    "bg": "За да оцени храната по снимка, KaloCalc изпраща умалено копие на снимката до услугата Gemini на Google с твоя API ключ. За превод на търсенията може да изпраща и текста за търсене и имената на намерените продукти. Нищо друго не се изпраща. Google обработва данните според собствените си условия. Можеш да премахнеш ключа си в Настройки по всяко време.",
+    "de": "Um Essen anhand eines Fotos zu schätzen, sendet KaloCalc mit deinem API-Schlüssel eine verkleinerte Kopie des Fotos an den Dienst Gemini von Google. Zum Übersetzen von Lebensmittelsuchen kann es auch den Suchtext und die Namen der gefundenen Produkte senden. Sonst wird nichts gesendet. Google verarbeitet die Daten nach eigenen Bedingungen. Du kannst deinen Schlüssel jederzeit in den Einstellungen entfernen.",
+    "es": "Para estimar la comida a partir de una foto, KaloCalc envía una copia reducida de la foto al servicio Gemini de Google, con tu clave de API. Para traducir las búsquedas de alimentos, también puede enviar el texto de la búsqueda y los nombres de los productos encontrados. No se envía nada más. Google procesa los datos según sus propias condiciones. Puedes quitar tu clave en Ajustes en cualquier momento.",
+    "fr": "Pour estimer un plat à partir d'une photo, KaloCalc envoie une copie réduite de la photo au service Gemini de Google, avec ta clé d'API. Pour traduire les recherches d'aliments, il peut aussi envoyer le texte recherché et les noms des produits trouvés. Rien d'autre n'est envoyé. Google traite ces données selon ses propres conditions. Tu peux retirer ta clé dans les Réglages à tout moment."
+  },
+  "consent_agree": {
+    "en": "Agree and continue",
+    "bg": "Съгласен съм, продължи",
+    "de": "Zustimmen und fortfahren",
+    "es": "Aceptar y continuar",
+    "fr": "Accepter et continuer"
+  },
+  "consent_decline": {
+    "en": "Not now",
+    "bg": "Не сега",
+    "de": "Nicht jetzt",
+    "es": "Ahora no",
+    "fr": "Pas maintenant"
   }
 }

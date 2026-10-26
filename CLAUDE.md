@@ -92,8 +92,11 @@ Network access goes through the `HTTPTransport` protocol. Tests use a fake; the 
 - **Public GitHub repo** to use the free CI quota; can be made private later.
 - **No third-party dependencies** in the app.
 - **Keychain for the API key**, key sent in an `x-goog-api-key` header, never in a URL.
-- **Gemini is optional.** Without a key photos give Vision labels only. With a key, photos are sent to Google; Settings
-  says so.
+- **Gemini is optional and needs consent.** Without a key photos give Vision labels only. A key alone sends nothing: the
+  user must first agree in an alert (when saving a new key, or at the first photo for a key saved earlier). The agreement is
+  stored with the key (`SettingsStore.geminiConsent`), clearing the key revokes it, and `geminiForSending` leaves the key out
+  without it, so neither photos nor search-translation text are sent. Done for App Store guideline 5.1.2 (sharing personal data
+  with third-party AI).
 - **Vision** `VNClassifyImageRequest`, confidence >= 0.3, errors give no labels (not a failure).
 - **Backup ZIP is deferred** by the user ("оставяме за по-късно"). The Android app has export/import; iOS does not yet.
 - **App icon** reuses the Android artwork, drawn by `tools/make_icon.py` (pycairo) into a 1024x1024 opaque PNG.

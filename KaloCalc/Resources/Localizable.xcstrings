@@ -1553,6 +1553,146 @@
         }
       }
     },
+    "consent_agree": {
+      "extractionState": "manual",
+      "localizations": {
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Съгласен съм, продължи"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zustimmen und fortfahren"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agree and continue"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aceptar y continuar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accepter et continuer"
+          }
+        }
+      }
+    },
+    "consent_decline": {
+      "extractionState": "manual",
+      "localizations": {
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не сега"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht jetzt"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not now"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ahora no"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas maintenant"
+          }
+        }
+      }
+    },
+    "consent_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "За да оцени храната по снимка, KaloCalc изпраща умалено копие на снимката до услугата Gemini на Google с твоя API ключ. За превод на търсенията може да изпраща и текста за търсене и имената на намерените продукти. Нищо друго не се изпраща. Google обработва данните според собствените си условия. Можеш да премахнеш ключа си в Настройки по всяко време."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um Essen anhand eines Fotos zu schätzen, sendet KaloCalc mit deinem API-Schlüssel eine verkleinerte Kopie des Fotos an den Dienst Gemini von Google. Zum Übersetzen von Lebensmittelsuchen kann es auch den Suchtext und die Namen der gefundenen Produkte senden. Sonst wird nichts gesendet. Google verarbeitet die Daten nach eigenen Bedingungen. Du kannst deinen Schlüssel jederzeit in den Einstellungen entfernen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To estimate food from a photo, KaloCalc sends a reduced-size copy of the photo to Google's Gemini service, using your API key. To translate food searches, it can also send the search text and the names of the products found. Nothing else is sent. Google processes this under its own terms. You can remove your key in Settings at any time."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para estimar la comida a partir de una foto, KaloCalc envía una copia reducida de la foto al servicio Gemini de Google, con tu clave de API. Para traducir las búsquedas de alimentos, también puede enviar el texto de la búsqueda y los nombres de los productos encontrados. No se envía nada más. Google procesa los datos según sus propias condiciones. Puedes quitar tu clave en Ajustes en cualquier momento."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour estimer un plat à partir d'une photo, KaloCalc envoie une copie réduite de la photo au service Gemini de Google, avec ta clé d'API. Pour traduire les recherches d'aliments, il peut aussi envoyer le texte recherché et les noms des produits trouvés. Rien d'autre n'est envoyé. Google traite ces données selon ses propres conditions. Tu peux retirer ta clé dans les Réglages à tout moment."
+          }
+        }
+      }
+    },
+    "consent_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "bg": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Да се изпрати ли на Google Gemini?"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An Google Gemini senden?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send to Google Gemini?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Enviar a Google Gemini?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoyer à Google Gemini ?"
+          }
+        }
+      }
+    },
     "diary_activity_adjust": {
       "extractionState": "manual",
       "localizations": {

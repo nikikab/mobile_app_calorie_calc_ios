@@ -110,6 +110,7 @@ final class FoodSearchViewModelTests: XCTestCase {
 
     func testPhotoWithAKeyGetsGeminiEstimates() async {
         model.settingsStore.saveKey("test-key")
+        model.settingsStore.saveGeminiConsent(true)
         let t = StubTransport { _ in (200, geminiEstimate) }
         let vm = makeVM(t, labels: [FoodLabel(text: "apple", confidence: 0.8)])
         vm.photoTaken(testImage())
@@ -120,8 +121,47 @@ final class FoodSearchViewModelTests: XCTestCase {
         XCTAssertNil(vm.message)
     }
 
+    func testPhotoWaitsForAgreementBeforeAnythingIsSentToGemini() async {
+        model.settingsStore.saveKey("test-key")
+        let t = StubTransport { _ in (200, geminiEstimate) }
+        let vm = makeVM(t, labels: [FoodLabel(text: "apple", confidence: 0.8)])
+        vm.photoTaken(testImage())
+        await vm.settle()
+        XCTAssertTrue(vm.awaitingConsent)
+        XCTAssertTrue(t.requests.isEmpty)
+        XCTAssertEqual(vm.photoLabels, ["apple"], "the on-device suggestions are shown meanwhile")
+        vm.grantConsent()
+        await vm.settle()
+        XCTAssertTrue(model.settingsStore.geminiConsent)
+        XCTAssertEqual(vm.estimates.map(\.name), ["Ябълка"])
+        XCTAssertEqual(t.requests.count, 1)
+    }
+
+    func testDecliningSendsNothingAndKeepsTheLabels() async {
+        model.settingsStore.saveKey("test-key")
+        let t = StubTransport { _ in (200, geminiEstimate) }
+        let vm = makeVM(t, labels: [FoodLabel(text: "apple", confidence: 0.8)])
+        vm.photoTaken(testImage())
+        await vm.settle()
+        vm.declineConsent()
+        XCTAssertFalse(vm.awaitingConsent)
+        XCTAssertFalse(model.settingsStore.geminiConsent)
+        XCTAssertTrue(t.requests.isEmpty)
+        XCTAssertEqual(vm.photoLabels, ["apple"])
+    }
+
+    func testSearchTranslationNeedsAgreementToo() async {
+        model.settingsStore.saveKey("test-key")
+        let t = StubTransport { _ in (200, #"{"hits":[]}"#) }
+        let vm = makeVM(t)
+        vm.search("мляко")
+        await vm.settle()
+        XCTAssertFalse(t.requests.contains { $0.url.host?.contains("googleapis") ?? false })
+    }
+
     func testGeminiFailureKeepsTheLabelsAndShowsTheError() async {
         model.settingsStore.saveKey("test-key")
+        model.settingsStore.saveGeminiConsent(true)
         let vm = makeVM(StubTransport { _ in (429, "") }, labels: [FoodLabel(text: "apple", confidence: 0.8)])
         vm.photoTaken(testImage())
         await vm.settle()

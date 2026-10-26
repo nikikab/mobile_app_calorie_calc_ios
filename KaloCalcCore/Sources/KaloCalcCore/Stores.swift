@@ -83,7 +83,7 @@ public final class ProfileStore {
 
 /// The Gemini key (kept in the secret store), the chosen model and the user's own models.
 public final class SettingsStore {
-    private static let keyKey = "gemini_key", modelKey = "gemini_model", customKey = "gemini_custom_models", languageKey = "app_language"
+    private static let keyKey = "gemini_key", modelKey = "gemini_model", customKey = "gemini_custom_models", languageKey = "app_language", consentKey = "gemini_consent"
     private let store: KeyValueStore
     private let secrets: SecretStore
     public init(_ store: KeyValueStore, secrets: SecretStore) { self.store = store; self.secrets = secrets }
@@ -100,9 +100,23 @@ public final class SettingsStore {
 
     public func saveLanguage(_ language: AppLanguage) { store.set(language.code, for: Self.languageKey) }
 
+    /// Whether the user agreed to photos and search text being sent to Gemini. It belongs to the key: clearing the key
+    /// takes the agreement back, so a new key asks again.
+    public var geminiConsent: Bool { store.bool(Self.consentKey) ?? false }
+
+    public func saveGeminiConsent(_ agreed: Bool) { store.set(agreed, for: Self.consentKey) }
+
+    /// The settings to send requests with: without the user's agreement the key is left out, so nothing is sent.
+    public var geminiForSending: GeminiSettings {
+        var g = gemini
+        if !geminiConsent { g.apiKey = "" }
+        return g
+    }
+
     public func saveKey(_ key: String) {
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
         secrets.setSecret(trimmed.isEmpty ? nil : trimmed, for: Self.keyKey)
+        if trimmed.isEmpty { saveGeminiConsent(false) }
     }
 
     public func saveModel(_ model: String) {

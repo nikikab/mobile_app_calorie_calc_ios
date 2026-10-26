@@ -78,6 +78,12 @@ struct FoodSearchView: View {
         .fullScreenCover(isPresented: $camera) { CameraPicker { vm.photoTaken($0) }.ignoresSafeArea() }
         .fullScreenCover(isPresented: $scanning) { BarcodeScanner { vm.lookupBarcode($0) } }
         .sheet(item: $sheet) { which in sheetContent(which) }
+        .alert(tr("consent_title"), isPresented: $vm.awaitingConsent) {
+            Button(tr("consent_agree")) { vm.grantConsent() }
+            Button(tr("consent_decline"), role: .cancel) { vm.declineConsent() }
+        } message: {
+            Text(tr("consent_message"))
+        }
         .onChange(of: vm.scanned?.name) { _, _ in
             if let p = vm.scanned { sheet = .portion(p) }
         }

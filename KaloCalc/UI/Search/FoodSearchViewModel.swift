@@ -22,6 +22,9 @@ final class FoodSearchViewModel {
     /// Gemini's guesses for the pending photo; empty without a key or while still loading.
     private(set) var estimates: [FoodEstimate] = []
     private(set) var geminiConfigured = false
+    /// Set when a photo is ready to be sent to Gemini but the user has not agreed to that yet.
+    var awaitingConsent = false
+    private var consentPhoto: URL?
     private(set) var favorites: [Favorite] = []
     /// Latest diary photo for each food name, shown next to the favorite with that name.
     private(set) var favoritePhotos: [String: String] = [:]
@@ -55,7 +58,8 @@ final class FoodSearchViewModel {
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !q.isEmpty else { return }
         run { [self] in
-            let gemini = model.settingsStore.gemini
+            // Without the user's agreement the key is left out, so nothing is translated or sent to Gemini.
+            let gemini = model.settingsStore.geminiForSending
             let off = OpenFoodFactsClient(services.transport)
             let client = GeminiClient(services.transport)
             let found = try await FoodSearch.search(query: q, gemini: gemini, language: language, plain: off.search) { texts, from, to in
@@ -93,10 +97,34 @@ final class FoodSearchViewModel {
         let gemini = model.settingsStore.gemini
         geminiConfigured = gemini.enabled
         guard gemini.enabled else { return }
+        guard model.settingsStore.geminiConsent else {
+            consentPhoto = file
+            awaitingConsent = true
+            return
+        }
+        try await estimate(file, gemini)
+    }
+
+    private func estimate(_ file: URL, _ gemini: GeminiSettings) async throws {
         let found = try await GeminiClient(services.transport).estimate(
             apiKey: gemini.apiKey, model: gemini.model, jpeg: Data(contentsOf: file), language: language.englishName)
         estimates = found
         message = found.isEmpty ? tr("search_gemini_no_food") : nil
+    }
+
+    /// The user agreed: remember it and send the photo that was waiting.
+    func grantConsent() {
+        model.settingsStore.saveGeminiConsent(true)
+        awaitingConsent = false
+        guard let file = consentPhoto else { return }
+        consentPhoto = nil
+        run { [self] in try await estimate(file, model.settingsStore.gemini) }
+    }
+
+    /// The user said not now: the photo stays with its on-device suggestions and nothing is sent.
+    func declineConsent() {
+        awaitingConsent = false
+        consentPhoto = nil
     }
 
     /// Shows a dish as the user corrected it, in place of the recognized one.
@@ -105,6 +133,7 @@ final class FoodSearchViewModel {
     }
 
     func clearPhoto() {
+        awaitingConsent = false; consentPhoto = nil
         pendingPhoto = nil; photoLabels = []; estimates = []; message = nil
     }
 
@@ -113,6 +142,7 @@ final class FoodSearchViewModel {
         task?.cancel()
         model.photos.discardPending(pendingPhoto)
         results = []; loading = false; message = nil; scanned = nil
+        awaitingConsent = false; consentPhoto = nil
         pendingPhoto = nil; photoLabels = []; estimates = []
     }
 
