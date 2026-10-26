@@ -10,7 +10,7 @@
   "locales": {
     "en-US": {
       "name": "KaloCalc",
-      "subtitle": "Snap food, count calories",
+      "subtitle": "Snap meals, count calories",
       "privacyPolicyUrl": "https://nikikab.github.io/kalocalc-privacy-ios/",
       "supportUrl": "https://nikikab.github.io/kalocalc-privacy-ios/support.html",
       "promotionalText": "Photograph your meal, scan a barcode or search a food, and see calories and macros against your own daily goal.",
