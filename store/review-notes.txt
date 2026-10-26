@@ -1,0 +1,24 @@
+KaloCalc is a calorie and nutrition diary. There is no account, sign-up or login, and no server of ours: all data is stored on the device. No special setup is needed to review the app.
+
+HOW TO TEST
+1. Goal tab: enter age, height, weight, activity and goal; the daily calorie target and macros are calculated.
+2. Diary tab: tap + (or the camera button) > "Add manually" to log a food, or search by name (Open Food Facts), or scan a barcode (e.g. an EAN-13 on any packaged food).
+3. Progress tab: log today's weight; the weight chart and the 7-day calorie chart update.
+4. Settings: change the app language (English, Bulgarian, German, French, Spanish). The Help button opens the user guide.
+
+OPTIONAL AI FEATURE (needs the user's own key)
+Photo estimates of a meal use Google's Gemini API. This is optional: the user adds their own free Gemini API key in Settings, and without a key no photo or text ever leaves the device (the app then only suggests food names using Apple's Vision framework on-device). To let you try it, a review-only key is below; please do not share it:
+GEMINI KEY FOR REVIEW: {GEMINI_KEY}
+To use it: Settings > paste the key > Save key > agree in the dialog that explains what is sent to Google > Test connection. Then Diary > camera button > take or choose a photo of food > the estimated dishes appear with Add / Edit buttons and a star to save a dish as a favorite.
+
+DATA AND PRIVACY
+- Nothing is sent to Gemini until the user adds a key and explicitly agrees in an in-app dialog. With a key and that agreement, a reduced-size copy of a photo is sent to Google's Gemini API to estimate the food, and search text and product names may be sent to translate searches to and from French. Nothing else (no profile, diary or weight) is sent. The key is stored in the iOS Keychain.
+- Food search and barcode lookups go to the open Open Food Facts database.
+- No ads, analytics or tracking.
+- Privacy policy: https://nikikab.github.io/kalocalc-privacy-ios/
+- Support: https://nikikab.github.io/kalocalc-privacy-ios/support.html
+
+PERMISSIONS
+Camera only (to photograph food and scan barcodes/QR codes). It is optional; photos can be chosen from the library instead, and "Add manually" needs no camera.
+
+The app does not use HealthKit, location, contacts, push notifications or in-app purchases. Calorie targets and estimates are approximate and are not medical advice (stated in the app and the description).

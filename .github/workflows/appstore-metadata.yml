@@ -1,0 +1,30 @@
+name: App Store metadata
+
+# Started by hand. "inspect" only reads App Store Connect; "apply" fills in texts, screenshots, review information and the build
+# from store/. It never submits the version for review.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: inspect (read only) or apply (write)
+        type: choice
+        options: [inspect, apply]
+        default: inspect
+      phone:
+        description: Contact phone for App Review (with country code); only used by apply
+        required: false
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install cryptography
+      - name: Run
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          GEMINI_REVIEW_KEY: ${{ secrets.GEMINI_REVIEW_KEY }}
+          REVIEW_PHONE: ${{ inputs.phone }}
+        run: python3 tools/asc_metadata.py "${{ inputs.mode }}"
