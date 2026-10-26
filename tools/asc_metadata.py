@@ -2,6 +2,7 @@
 """Fills in the App Store Connect product page from store/metadata.json through the App Store Connect API.
 
   asc_metadata.py inspect   only reads: prints the app, its editable version, build and what is filled in
+  asc_metadata.py check     only reads: lists what is still missing before the version can be submitted
   asc_metadata.py apply     writes texts, categories, review information, screenshots and selects the newest build
 
 It never submits the version for review; that stays a manual step in App Store Connect.
@@ -138,6 +139,60 @@ def inspect(app_id, version_id):
         f"notes {len(a.get('notes') or '')} chars")
 
 
+def check(app_id, version_id):
+    """Prints OK / MISSING for what App Store Connect needs before submitting. App Privacy is not readable through the API."""
+    problems = []
+
+    def report(ok, label, detail=""):
+        say(f"  {'OK     ' if ok else 'MISSING'} {label}{(': ' + str(detail)) if detail != '' else ''}")
+        if not ok:
+            problems.append(label)
+
+    app = data("GET", f"/v1/apps/{app_id}")
+    report(attrs(app).get("contentRightsDeclaration") is not None, "Content rights declaration", attrs(app).get("contentRightsDeclaration"))
+    v = data("GET", f"/v1/appStoreVersions/{version_id}")
+    report(bool(attrs(v).get("copyright")), "Copyright", attrs(v).get("copyright"))
+    report(bool(attrs(v).get("releaseType")), "Release type", attrs(v).get("releaseType"))
+
+    build = data("GET", f"/v1/appStoreVersions/{version_id}/build", allow=(404,))
+    report(bool(build), "Build selected", attrs(build).get("version") if build else "")
+    if build:
+        report(attrs(build).get("usesNonExemptEncryption") is not None, "Export compliance answered", attrs(build).get("usesNonExemptEncryption"))
+
+    for loc, lid in localizations(version_id).items():
+        a = attrs(data("GET", f"/v1/appStoreVersionLocalizations/{lid}"))
+        for field in ("description", "keywords", "supportUrl"):
+            report(bool(a.get(field)), f"[{loc}] {field}")
+        sets = data("GET", f"/v1/appStoreVersionLocalizations/{lid}/appScreenshotSets") or []
+        shots = sum(len(data("GET", f"/v1/appScreenshotSets/{x['id']}/appScreenshots") or []) for x in sets)
+        report(shots > 0, f"[{loc}] screenshots", shots)
+
+    info_id, info_locs = info_localizations(app_id)
+    for loc, iid in info_locs.items():
+        a = attrs(data("GET", f"/v1/appInfoLocalizations/{iid}"))
+        report(bool(a.get("privacyPolicyUrl")), f"[{loc}] privacy policy URL", a.get("privacyPolicyUrl") or "")
+        report(bool(a.get("subtitle")), f"[{loc}] subtitle", a.get("subtitle") or "")
+    info = call("GET", f"/v1/appInfos/{info_id}?include=primaryCategory,secondaryCategory")
+    cats = (info.get("data", {}).get("relationships", {}))
+    report(bool((cats.get("primaryCategory") or {}).get("data")), "Primary category", ((cats.get("primaryCategory") or {}).get("data") or {}).get("id", ""))
+
+    age = data("GET", f"/v1/appInfos/{info_id}/ageRatingDeclaration", allow=(404,))
+    values = attrs(age)
+    empty = [k for k, val in values.items() if val is None]
+    report(bool(values) and not empty, "Age rating answered", f"{len(values) - len(empty)}/{len(values)} answered" + (f", empty: {', '.join(empty)}" if empty else ""))
+
+    price = call("GET", f"/v1/apps/{app_id}/appPriceSchedule", allow=(404,))
+    report(bool(price.get("data")), "Price (free) set")
+    avail = call("GET", f"/v1/apps/{app_id}/appAvailabilityV2", allow=(404,))
+    report(bool(avail.get("data")), "Availability (countries) set")
+
+    detail = attrs(data("GET", f"/v1/appStoreVersions/{version_id}/appStoreReviewDetail", allow=(404,)))
+    for field in ("contactFirstName", "contactLastName", "contactEmail", "contactPhone", "notes"):
+        report(bool(detail.get(field)), f"App Review {field}")
+    say("  ?       App Privacy answers: cannot be read through the API, check the App Privacy page by hand")
+    say(f"{len(problems)} thing(s) missing." if problems else "Nothing missing that the API can see.")
+
+
 def upsert(kind_path, kind_type, existing_id, attributes, parent=None):
     if existing_id:
         data("PATCH", f"{kind_path}/{existing_id}", {"data": {"type": kind_type, "id": existing_id, "attributes": attributes}})
@@ -228,11 +283,13 @@ def main():
     newest_build(app_id)
     if mode == "inspect":
         inspect(app_id, version_id)
+    elif mode == "check":
+        check(app_id, version_id)
     elif mode == "apply":
         apply(app_id, version_id)
         say("Done. Check the page in App Store Connect, fill in App Privacy and the age rating, then submit.")
     else:
-        sys.exit("usage: asc_metadata.py inspect|apply")
+        sys.exit("usage: asc_metadata.py inspect|check|apply")
 
 
 main()
