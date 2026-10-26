@@ -150,14 +150,14 @@ def upsert(kind_path, kind_type, existing_id, attributes, parent=None):
 
 def upload_screenshots(loc_id, files):
     sets = data("GET", f"/v1/appStoreVersionLocalizations/{loc_id}/appScreenshotSets") or []
-    sset = next((s for s in sets if attrs(s).get("screenshotDisplayType") == "APP_IPHONE_69"), None)
+    sset = next((s for s in sets if attrs(s).get("screenshotDisplayType") == "APP_IPHONE_67"), None)
     if sset:
         set_id = sset["id"]
         for old in data("GET", f"/v1/appScreenshotSets/{set_id}/appScreenshots") or []:
             data("DELETE", f"/v1/appScreenshots/{old['id']}")
     else:
         set_id = data("POST", "/v1/appScreenshotSets", {"data": {
-            "type": "appScreenshotSets", "attributes": {"screenshotDisplayType": "APP_IPHONE_69"},
+            "type": "appScreenshotSets", "attributes": {"screenshotDisplayType": "APP_IPHONE_67"},
             "relationships": {"appStoreVersionLocalization": {"data": {"type": "appStoreVersionLocalizations", "id": loc_id}}}}})["id"]
     for path in files:
         blob = path.read_bytes()
