@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: inspect or check (read only) or apply (write)
+        description: inspect, check or builds (read only) or apply (write)
         type: choice
-        options: [inspect, check, apply]
+        options: [inspect, check, apply, builds]
         default: inspect
 
 jobs:

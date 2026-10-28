@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fills in the App Store Connect product page from store/metadata.json through the App Store Connect API.
 
+  asc_metadata.py builds    only reads: prints every build, its TestFlight state, its beta groups and their testers
   asc_metadata.py inspect   only reads: prints the app, its editable version, build and what is filled in
   asc_metadata.py check     only reads: lists what is still missing before the version can be submitted
   asc_metadata.py apply     writes texts, categories, review information, screenshots and selects the newest build
@@ -106,6 +107,23 @@ def newest_build(app_id):
         if a.get("processingState") == "VALID" and not a.get("expired"):
             return b["id"], a.get("version")
     return None, None
+
+
+def builds_report(app_id):
+    builds = data("GET", f"/v1/builds?filter[app]={app_id}&sort=-uploadedDate&limit=10&include=preReleaseVersion,buildBetaDetail") or []
+    for b in builds:
+        a = attrs(b)
+        detail = data("GET", f"/v1/builds/{b['id']}/buildBetaDetail") or {}
+        d = attrs(detail)
+        say(f"  build {a.get('version')}: {a.get('processingState')}{' (expired)' if a.get('expired') else ''}, "
+            f"min iOS {a.get('minOsVersion')}, internal {d.get('internalBuildState')}, external {d.get('externalBuildState')}, "
+            f"auto-notify {d.get('autoNotifyEnabled')}, uploaded {a.get('uploadedDate')}")
+        groups = data("GET", f"/v1/builds/{b['id']}/betaGroups") or []
+        say("    groups: " + (", ".join(f"{attrs(g).get('name')} (internal={attrs(g).get('isInternalGroup')})" for g in groups) or "none"))
+    for g in data("GET", f"/v1/apps/{app_id}/betaGroups") or []:
+        testers = data("GET", f"/v1/betaGroups/{g['id']}/betaTesters?limit=50") or []
+        say(f"  group {attrs(g).get('name')} (internal={attrs(g).get('isInternalGroup')}): "
+            + (", ".join(f"{attrs(t).get('firstName')} {attrs(t).get('inviteType')}/{attrs(t).get('state')}" for t in testers) or "no testers"))
 
 
 def localizations(version_id):
@@ -278,6 +296,9 @@ def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "inspect"
     app_id, name = find_app()
     say(f"App {name} ({app_id})")
+    if mode == "builds":
+        builds_report(app_id)
+        return
     version_id, version = find_version(app_id)
     say(f"Editable version {version} ({version_id})")
     newest_build(app_id)
@@ -289,7 +310,7 @@ def main():
         apply(app_id, version_id)
         say("Done. Check the page in App Store Connect, fill in App Privacy and the age rating, then submit.")
     else:
-        sys.exit("usage: asc_metadata.py inspect|check|apply")
+        sys.exit("usage: asc_metadata.py inspect|check|apply|builds")
 
 
 main()
