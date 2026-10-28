@@ -126,6 +126,20 @@ def builds_report(app_id):
             + (", ".join(f"{attrs(t).get('firstName')} {attrs(t).get('inviteType')}/{attrs(t).get('state')}" for t in testers) or "no testers"))
 
 
+def app_state_report(app_id):
+    def show(label, path):
+        r = call("GET", path, allow=(403, 404))
+        d = r.get("data")
+        items = d if isinstance(d, list) else ([d] if d else [])
+        say(f"  {label}: " + (", ".join(f"{i.get('type')}/{json.dumps(attrs(i), ensure_ascii=False)[:160]}" for i in items[:8]) or "nothing / not readable"))
+    show("app", f"/v1/apps/{app_id}")
+    show("availability", f"/v1/apps/{app_id}/appAvailability?include=availableTerritories&limit=5")
+    show("price schedule", f"/v1/apps/{app_id}/appPriceSchedule")
+    show("beta review submissions", f"/v1/betaAppReviewSubmissions?filter[build]=" + (data("GET", f"/v1/builds?filter[app]={app_id}&sort=-uploadedDate&limit=1")[0]["id"]))
+    show("beta license agreement", f"/v1/apps/{app_id}/betaLicenseAgreement")
+    show("beta app review detail", f"/v1/apps/{app_id}/betaAppReviewDetail")
+
+
 def localizations(version_id):
     items = data("GET", f"/v1/appStoreVersions/{version_id}/appStoreVersionLocalizations?limit=50") or []
     return {attrs(i)["locale"]: i["id"] for i in items}
@@ -298,6 +312,7 @@ def main():
     say(f"App {name} ({app_id})")
     if mode == "builds":
         builds_report(app_id)
+        app_state_report(app_id)
         return
     version_id, version = find_version(app_id)
     say(f"Editable version {version} ({version_id})")
