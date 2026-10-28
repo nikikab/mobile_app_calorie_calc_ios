@@ -113,15 +113,15 @@ def builds_report(app_id):
     builds = data("GET", f"/v1/builds?filter[app]={app_id}&sort=-uploadedDate&limit=10&include=preReleaseVersion,buildBetaDetail") or []
     for b in builds:
         a = attrs(b)
-        detail = data("GET", f"/v1/builds/{b['id']}/buildBetaDetail") or {}
+        detail = call("GET", f"/v1/builds/{b['id']}/buildBetaDetail", allow=(403, 404)).get("data") or {}
         d = attrs(detail)
         say(f"  build {a.get('version')}: {a.get('processingState')}{' (expired)' if a.get('expired') else ''}, "
             f"min iOS {a.get('minOsVersion')}, internal {d.get('internalBuildState')}, external {d.get('externalBuildState')}, "
             f"auto-notify {d.get('autoNotifyEnabled')}, uploaded {a.get('uploadedDate')}")
-        groups = data("GET", f"/v1/builds/{b['id']}/betaGroups") or []
+        groups = data("GET", f"/v1/builds/{b['id']}/betaGroups", allow=(403, 404)) or []
         say("    groups: " + (", ".join(f"{attrs(g).get('name')} (internal={attrs(g).get('isInternalGroup')})" for g in groups) or "none"))
-    for g in data("GET", f"/v1/apps/{app_id}/betaGroups") or []:
-        testers = data("GET", f"/v1/betaGroups/{g['id']}/betaTesters?limit=50") or []
+    for g in data("GET", f"/v1/apps/{app_id}/betaGroups", allow=(403, 404)) or []:
+        testers = data("GET", f"/v1/betaGroups/{g['id']}/betaTesters?limit=50", allow=(403, 404)) or []
         say(f"  group {attrs(g).get('name')} (internal={attrs(g).get('isInternalGroup')}): "
             + (", ".join(f"{attrs(t).get('firstName')} {attrs(t).get('inviteType')}/{attrs(t).get('state')}" for t in testers) or "no testers"))
 
