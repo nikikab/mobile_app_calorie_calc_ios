@@ -132,6 +132,11 @@ final class FoodSearchViewModel {
         estimates = estimates.map { $0 == original ? changed : $0 }
     }
 
+    /// Drops a dish that has been added to the diary, so it is not added twice.
+    func removeEstimate(_ e: FoodEstimate) {
+        estimates.removeAll { $0 == e }
+    }
+
     func clearPhoto() {
         awaitingConsent = false; consentPhoto = nil
         pendingPhoto = nil; photoLabels = []; estimates = []; message = nil

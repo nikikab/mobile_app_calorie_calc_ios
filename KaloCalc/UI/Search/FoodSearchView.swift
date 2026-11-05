@@ -266,10 +266,13 @@ struct FoodSearchView: View {
         }
     }
 
-    /// Adds one recognized dish; it stays listed and the photo is kept, so the other dishes can still be added.
+    /// Adds one recognized dish and drops it from the list so it is not added twice. The photo is kept for the others;
+    /// the last dish closes the screen.
     private func addEstimate(_ e: FoodEstimate) {
+        let last = vm.estimates.count <= 1
         diary.add(EntryValues(meal: meal, name: e.name, grams: e.grams, kcal: roundedKcal(e), proteinG: e.proteinG, carbsG: e.carbsG, fatG: e.fatG),
-                  pendingPhoto: vm.pendingPhoto, keepPhoto: true)
+                  pendingPhoto: vm.pendingPhoto, keepPhoto: !last)
+        if last { dismiss() } else { vm.removeEstimate(e) }
     }
 
     private func add(_ e: FoodEstimate) {
