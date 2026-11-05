@@ -140,6 +140,26 @@ def app_state_report(app_id):
     show("beta app review detail", f"/v1/apps/{app_id}/betaAppReviewDetail")
 
 
+def version_report(app_id):
+    """Read only: the newest iOS version whatever its state, with the selected build, release type, price and territories."""
+    versions = data("GET", f"/v1/apps/{app_id}/appStoreVersions?filter[platform]=IOS&limit=1") or []
+    if not versions:
+        sys.exit("No iOS version.")
+    v = versions[0]
+    say(f"  version {json.dumps(attrs(v), ensure_ascii=False)}")
+
+    def show(label, path):
+        r = call("GET", path, allow=(403, 404))
+        d = r.get("data")
+        items = d if isinstance(d, list) else ([d] if d else [])
+        say(f"  {label}: " + (", ".join(f"{i.get('type')}/{json.dumps(attrs(i), ensure_ascii=False)[:200]}" for i in items[:10]) or "nothing / not readable"))
+    show("selected build", f"/v1/appStoreVersions/{v['id']}/build")
+    show("phased release", f"/v1/appStoreVersions/{v['id']}/appStoreVersionPhasedRelease")
+    show("availability", f"/v1/apps/{app_id}/appAvailabilityV2")
+    show("territories", f"/v1/apps/{app_id}/appAvailabilityV2/territoryAvailabilities?limit=200&fields[territoryAvailabilities]=available")
+    show("current prices", f"/v1/apps/{app_id}/appPriceSchedule/manualPrices?include=appPricePoint&limit=5")
+
+
 def localizations(version_id):
     items = data("GET", f"/v1/appStoreVersions/{version_id}/appStoreVersionLocalizations?limit=50") or []
     return {attrs(i)["locale"]: i["id"] for i in items}
@@ -314,6 +334,9 @@ def main():
         builds_report(app_id)
         app_state_report(app_id)
         return
+    if mode == "version":
+        version_report(app_id)
+        return
     version_id, version = find_version(app_id)
     say(f"Editable version {version} ({version_id})")
     newest_build(app_id)
@@ -325,7 +348,7 @@ def main():
         apply(app_id, version_id)
         say("Done. Check the page in App Store Connect, fill in App Privacy and the age rating, then submit.")
     else:
-        sys.exit("usage: asc_metadata.py inspect|check|apply|builds")
+        sys.exit("usage: asc_metadata.py inspect|check|apply|builds|version")
 
 
 main()
