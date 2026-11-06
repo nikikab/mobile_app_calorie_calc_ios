@@ -160,6 +160,18 @@ def version_report(app_id):
     show("current prices", f"/v1/apps/{app_id}/appPriceSchedule/manualPrices?include=appPricePoint&limit=5")
 
 
+def create_version(app_id, version_string):
+    """Creates the next iOS version (manual release) unless one already exists."""
+    versions = data("GET", f"/v1/apps/{app_id}/appStoreVersions?filter[platform]=IOS&limit=10") or []
+    if any(attrs(v).get("versionString") == version_string for v in versions):
+        say(f"Version {version_string} already exists.")
+        return
+    call("POST", "/v1/appStoreVersions", {"data": {"type": "appStoreVersions",
+         "attributes": {"platform": "IOS", "versionString": version_string, "releaseType": "MANUAL"},
+         "relationships": {"app": {"data": {"type": "apps", "id": app_id}}}}})
+    say(f"Created version {version_string}.")
+
+
 def localizations(version_id):
     items = data("GET", f"/v1/appStoreVersions/{version_id}/appStoreVersionLocalizations?limit=50") or []
     return {attrs(i)["locale"]: i["id"] for i in items}
@@ -334,6 +346,9 @@ def main():
         builds_report(app_id)
         app_state_report(app_id)
         return
+    if mode == "newversion":
+        create_version(app_id, os.environ.get("NEW_VERSION", "1.1"))
+        return
     if mode == "version":
         version_report(app_id)
         return
@@ -348,7 +363,7 @@ def main():
         apply(app_id, version_id)
         say("Done. Check the page in App Store Connect, fill in App Privacy and the age rating, then submit.")
     else:
-        sys.exit("usage: asc_metadata.py inspect|check|apply|builds|version")
+        sys.exit("usage: asc_metadata.py inspect|check|apply|builds|version|newversion")
 
 
 main()
