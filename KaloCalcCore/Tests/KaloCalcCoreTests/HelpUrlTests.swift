@@ -12,13 +12,13 @@ final class HelpUrlTests: XCTestCase {
     }
 
     func testEnglishOpensTheDefaultGuide() {
-        XCTAssertTrue(AppLanguage.en.helpUrl().hasSuffix("/mobile_app_calorie_calc_howto/"))
+        XCTAssertTrue(AppLanguage.en.helpUrl().hasSuffix("/mobile_app_calorie_calc_ios_howto/"))
         XCTAssertTrue(AppLanguage.en.helpUrl(scenario: scenario).hasSuffix("/docs/en/\(scenario)"))
     }
 
     func testLinksPointToGitHubPages() {
         for l in AppLanguage.allCases {
-            XCTAssertTrue(l.helpUrl().hasPrefix("https://nikikab.github.io/mobile_app_calorie_calc_howto/"))
+            XCTAssertTrue(l.helpUrl().hasPrefix("https://nikikab.github.io/mobile_app_calorie_calc_ios_howto/"))
         }
     }
 }
