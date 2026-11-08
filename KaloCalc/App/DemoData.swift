@@ -5,9 +5,13 @@ import KaloCalcCore
 @MainActor
 extension AppModel {
     static func demo(today: Date = Date()) -> AppModel {
-        let model = AppModel.inMemory()
+        let profile = Profile(sex: .female, age: 34, heightCm: 168, weightKg: 64.5, activity: .moderate, goal: .lose)
+        // A busy day: well above what the norm assumes, so the diary shows the activity line.
+        let model = AppModel.inMemory(health: DemoHealth(burned: expectedActiveKcal(profile) + 450))
+        model.settingsStore.saveHealthSync(true)
+        model.settingsStore.saveActivityAdjust(true)
         let day = epochDay(of: today)
-        model.profileStore.save(Profile(sex: .female, age: 34, heightCm: 168, weightKg: 64.5, activity: .moderate, goal: .lose))
+        model.profileStore.save(profile)
         let r = model.repository
         func add(_ meal: Meal, _ name: String, _ grams: Double, _ kcal: Int, _ p: Double, _ c: Double, _ f: Double) {
             _ = try? r.insert(FoodEntry(epochDay: day, meal: meal, name: name, kcal: kcal, proteinG: p, carbsG: c, fatG: f,
@@ -33,4 +37,17 @@ extension AppModel {
         }
         return model
     }
+}
+
+/// Pretends Apple Health is there, for screenshots only: it reports a fixed day of activity and writes nothing.
+@MainActor
+final class DemoHealth: HealthSync {
+    private let burned: Double
+    init(burned: Double) { self.burned = burned }
+    var isAvailable: Bool { true }
+    func requestWriteAccess() async -> Bool { true }
+    func requestActivityAccess() async -> Bool { true }
+    func write(_ entries: [FoodEntry]) async throws {}
+    func delete(entryId: Int64) async {}
+    func activeKcal(epochDay: Int64) async -> Double? { burned }
 }

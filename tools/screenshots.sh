@@ -39,5 +39,6 @@ for lang in en bg; do
   shot goal-plan "$lang" -tab goal -sheet plan
   shot settings "$lang" -tab settings -sheet report
   shot settings-model "$lang" -tab settings -sheet model
+  shot settings-health "$lang" -tab settings -sheet health
 done
 ls -l "$OUT"

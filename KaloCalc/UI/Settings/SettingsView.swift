@@ -6,6 +6,7 @@ struct SettingsView: View {
     @State private var vm: SettingsViewModel
     @State private var scanning = false
     @State private var addingModel = false
+    private let scrollToHealth: Bool
     @Environment(\.openURL) private var openURL
 
     init(model: AppModel, initialSheet: String? = nil) {
@@ -14,9 +15,16 @@ struct SettingsView: View {
         if initialSheet == "report" { vm.loadDemo() }
         _vm = State(initialValue: vm)
         _addingModel = State(initialValue: initialSheet == "model")
+        scrollToHealth = initialSheet == "health"
     }
 
     var body: some View {
+        ScrollViewReader { proxy in
+            form.onAppear { if scrollToHealth { proxy.scrollTo("health", anchor: .top) } }
+        }
+    }
+
+    private var form: some View {
         Form {
             Section {
                 Picker(tr("language_label"), selection: Binding(get: { model.language }, set: { model.setLanguage($0) })) {
@@ -73,7 +81,7 @@ struct SettingsView: View {
 
     @ViewBuilder private var healthSection: some View {
         Section {
-            Text(tr("health_intro")).font(.callout)
+            Text(tr("health_intro")).font(.callout).id("health")
             Toggle(tr("health_switch"), isOn: Binding(get: { vm.healthSync }, set: { on in Task { await vm.setHealthSync(on) } }))
             if vm.healthSync {
                 Button(tr("hc_sync_past")) { Task { await vm.syncPastEntries() } }.disabled(vm.healthBusy)
