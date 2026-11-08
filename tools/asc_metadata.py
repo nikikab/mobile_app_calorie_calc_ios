@@ -303,7 +303,7 @@ def apply(app_id, version_id):
     for locale, m in meta["locales"].items():
         say(f"Locale {locale}")
         loc_id = upsert("/v1/appStoreVersionLocalizations", "appStoreVersionLocalizations", locs.get(locale),
-                        {k: m[k] for k in ("description", "keywords", "promotionalText", "supportUrl")} | ({} if locs.get(locale) else {"locale": locale}),
+                        {k: m[k] for k in ("description", "keywords", "promotionalText", "supportUrl", "whatsNew") if k in m} | ({} if locs.get(locale) else {"locale": locale}),
                         {"appStoreVersion": {"data": {"type": "appStoreVersions", "id": version_id}}})
         upsert("/v1/appInfoLocalizations", "appInfoLocalizations", info_locs.get(locale),
                {k: m[k] for k in ("name", "subtitle", "privacyPolicyUrl")} | ({} if info_locs.get(locale) else {"locale": locale}),
@@ -347,7 +347,7 @@ def main():
         app_state_report(app_id)
         return
     if mode == "newversion":
-        create_version(app_id, os.environ.get("NEW_VERSION", "1.1"))
+        create_version(app_id, os.environ.get("NEW_VERSION", "1.2"))
         return
     if mode == "version":
         version_report(app_id)

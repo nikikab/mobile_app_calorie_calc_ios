@@ -18,7 +18,10 @@ DATA AND PRIVACY
 - Privacy policy: https://nikikab.github.io/kalocalc-privacy-ios/
 - Support: https://nikikab.github.io/kalocalc-privacy-ios/support.html
 
-PERMISSIONS
-Camera only (to photograph food and scan barcodes/QR codes). It is optional; photos can be chosen from the library instead, and "Add manually" needs no camera.
+APPLE HEALTH (OPTIONAL, OFF BY DEFAULT)
+Settings > Apple Health has two switches. "Sync with Apple Health" writes each diary entry (calories, protein, carbs, fat) to Health as dietary samples; it asks for write permission only when switched on. "Adjust target by burned calories" reads only Active Energy for the shown day, on the device, to raise or lower that day's calorie target (the Diary shows "Activity: +N kcal"). Nothing read from or written to Health leaves the device; it is not used for advertising, analytics or sent to Gemini or any server. To try it: add a food in the Diary, switch on sync, allow the permission, and the food appears in Health > Browse > Nutrition. The app works fully with both switches off.
 
-The app does not use HealthKit, location, contacts, push notifications or in-app purchases. Calorie targets and estimates are approximate and are not medical advice (stated in the app and the description).
+PERMISSIONS
+Camera (to photograph food and scan barcodes/QR codes) and, only if the user switches it on, Apple Health. Both are optional; photos can be chosen from the library instead, and "Add manually" needs no camera.
+
+The app does not use location, contacts, push notifications or in-app purchases. Calorie targets and estimates are approximate and are not medical advice (stated in the app and the description).
