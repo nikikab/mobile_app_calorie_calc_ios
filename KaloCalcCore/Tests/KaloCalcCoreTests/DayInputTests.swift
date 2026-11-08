@@ -40,7 +40,7 @@ final class DaySummaryTests: XCTestCase {
         let over = summarizeDay(entries: [entry(99_999)], profile: profile, plans: [], activePlanId: 0, dayTarget: nil)
         XCTAssertEqual(over.kcalProgress, 1)
         XCTAssertLessThan(over.remainingKcal, 0)
-        let none = DaySummary(targetKcal: 0, goals: MacroGoals(0, 0, 0), defaultKcal: 0, isCustomTarget: false, kcal: 5, proteinG: 1, carbsG: 1, fatG: 1)
+        let none = DaySummary(targetKcal: 0, goals: MacroGoals(0, 0, 0), defaultKcal: 0, isCustomTarget: false, kcal: 5, proteinG: 1, carbsG: 1, fatG: 1, activity: nil)
         XCTAssertEqual(none.kcalProgress, 0)
         XCTAssertEqual(none.proteinProgress, 0)
     }
@@ -91,5 +91,46 @@ final class InputTests: XCTestCase {
         XCTAssertEqual([r.kcal, r.proteinG, r.carbsG, r.fatG, r.baseKcal], [1000, 50, 100, 30, 1000])
         XCTAssertEqual(r.id, 4)
         XCTAssertEqual(r.name, "P")
+    }
+}
+
+final class DaySummaryActivityTests: XCTestCase {
+    let profile = Profile()
+    func summary(_ active: Double?, finished: Bool = true, dayTarget: DayTarget? = nil) -> DaySummary {
+        summarizeDay(entries: [], profile: profile, plans: [], activePlanId: 0, dayTarget: dayTarget, activeKcal: active, dayFinished: finished)
+    }
+
+    func testNoReadingLeavesTheTargetAlone() {
+        let s = summary(nil)
+        XCTAssertNil(s.activity)
+        XCTAssertEqual(s.targetKcal, calculate(profile).target)
+    }
+
+    func testAReadingInsideTheBandChangesNothing() {
+        XCTAssertNil(summary(expectedActiveKcal(profile)).activity)
+    }
+
+    func testMuchMoreActivityRaisesTheTargetAndReportsIt() {
+        let usual = calculate(profile).target
+        let expected = expectedActiveKcal(profile)
+        let s = summary(expected + 1000)
+        let note = try! XCTUnwrap(s.activity)
+        XCTAssertGreaterThan(note.kcal, 0)
+        XCTAssertEqual(s.targetKcal, usual + note.kcal)
+        XCTAssertEqual(s.defaultKcal, usual)
+        XCTAssertEqual(note.actual, roundHalfUp(expected + 1000))
+        XCTAssertEqual(note.expected, roundHalfUp(expected))
+        XCTAssertFalse(s.isCustomTarget)
+    }
+
+    func testATargetTypedInForTheDayIsNotMoved() {
+        let s = summary(expectedActiveKcal(profile) + 1000, dayTarget: DayTarget(epochDay: 1, kcal: 1800))
+        XCTAssertNil(s.activity)
+        XCTAssertEqual(s.targetKcal, 1800)
+    }
+
+    func testTodayNeverGoesDown() {
+        XCTAssertNil(summary(0, finished: false).activity)
+        XCTAssertNotNil(summary(0, finished: true).activity)
     }
 }

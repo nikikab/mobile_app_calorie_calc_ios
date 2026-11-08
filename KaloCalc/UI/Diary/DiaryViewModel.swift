@@ -11,6 +11,8 @@ final class DiaryViewModel {
     private(set) var favorites: [Favorite] = []
     private(set) var summary: DaySummary
     var errorMessage: String?
+    /// Active calories of the shown day from Apple Health; nil when the option is off or nothing is recorded.
+    private var burned: Double?
 
     init(model: AppModel, today: Date = Date()) {
         self.model = model
@@ -32,12 +34,25 @@ final class DiaryViewModel {
             entries = try repo.entries(forDay: day)
             favorites = try repo.favorites()
             summary = summarizeDay(entries: entries, profile: model.profileStore.profile, plans: try repo.plans(),
-                                   activePlanId: model.profileStore.activePlanId, dayTarget: try repo.dayTarget(for: day))
+                                   activePlanId: model.profileStore.activePlanId, dayTarget: try repo.dayTarget(for: day),
+                                   activeKcal: burned, dayFinished: day < epochDay(of: Date()))
         }
     }
 
     func shiftDay(_ delta: Int64) {
         day += delta
+        burned = nil
+        reload()
+        Task { await refreshActivity() }
+    }
+
+    /// Reads the shown day's burned calories again (after the setting changed, the app came back, or the day changed).
+    func refreshActivity() async {
+        let shown = day
+        var value: Double?
+        if model.settingsStore.activityAdjust { value = await model.health.activeKcal(epochDay: shown) }
+        guard shown == day, value != burned else { return }
+        burned = value
         reload()
     }
 
@@ -46,9 +61,11 @@ final class DiaryViewModel {
     func add(_ v: EntryValues, pendingPhoto: String? = nil, keepPhoto: Bool = false) {
         perform {
             let photo = try model.photos.commitPending(pendingPhoto, keepPending: keepPhoto)
-            try model.repository.insert(FoodEntry(
+            var entry = FoodEntry(
                 epochDay: day, meal: v.meal, name: v.name, kcal: v.kcal, proteinG: v.proteinG, carbsG: v.carbsG, fatG: v.fatG,
-                photoPath: photo, epochMillis: entryTimeMillis(epochDay: day), grams: v.grams))
+                photoPath: photo, epochMillis: entryTimeMillis(epochDay: day), grams: v.grams)
+            entry.id = try model.repository.insert(entry)
+            syncToHealth([entry])
             reload()
         }
     }
@@ -56,13 +73,17 @@ final class DiaryViewModel {
     /// Adds every item to `meal` in one go; each entry gets its own copy of the photo so deleting one keeps the others.
     func addAll(meal: Meal, items: [FoodEstimate], pendingPhoto: String?) {
         perform {
+            var added: [FoodEntry] = []
             for e in items {
                 let photo = try model.photos.commitPending(pendingPhoto, keepPending: true)
-                try model.repository.insert(FoodEntry(
+                var entry = FoodEntry(
                     epochDay: day, meal: meal, name: e.name, kcal: roundHalfUp(e.kcal), proteinG: e.proteinG, carbsG: e.carbsG, fatG: e.fatG,
-                    photoPath: photo, epochMillis: entryTimeMillis(epochDay: day), grams: e.grams))
+                    photoPath: photo, epochMillis: entryTimeMillis(epochDay: day), grams: e.grams)
+                entry.id = try model.repository.insert(entry)
+                added.append(entry)
             }
             model.photos.discardPending(pendingPhoto)
+            syncToHealth(added)
             reload()
         }
     }
@@ -74,6 +95,7 @@ final class DiaryViewModel {
         changed.proteinG = v.proteinG; changed.carbsG = v.carbsG; changed.fatG = v.fatG
         perform {
             try model.repository.update(changed)
+            syncToHealth([changed])
             reload()
         }
     }
@@ -82,6 +104,9 @@ final class DiaryViewModel {
         perform {
             try model.repository.deleteEntry(id: entry.id)
             model.photos.delete(entry.photoPath)
+            // Removed even if sync was switched off since, so a deleted dish doesn't linger in Health.
+            let health = model.health
+            Task { await health.delete(entryId: entry.id) }
             reload()
         }
     }
@@ -108,6 +133,13 @@ final class DiaryViewModel {
             try model.repository.deleteFavorite(id: favorite.id)
             reload()
         }
+    }
+
+    /// A failed write must never lose the diary entry; "Sync past entries" in Settings catches up later.
+    private func syncToHealth(_ entries: [FoodEntry]) {
+        guard model.settingsStore.healthSync else { return }
+        let health = model.health
+        Task { try? await health.write(entries) }
     }
 
     private func perform(_ work: () throws -> Void) {

@@ -24,6 +24,7 @@ struct DiaryView: View {
     @State private var vm: DiaryViewModel
     @State private var sheet: DiarySheet?
     @State private var route: SearchRoute?
+    @Environment(\.scenePhase) private var scenePhase
 
     init(model: AppModel, initialSheet: String? = nil, onOpenSettings: @escaping () -> Void = {}) {
         self.model = model
@@ -77,7 +78,8 @@ struct DiaryView: View {
             }
         }
         .errorAlert($vm.errorMessage)
-        .onAppear { vm.reload() }
+        .onAppear { vm.reload(); Task { await vm.refreshActivity() } }
+        .onChange(of: scenePhase) { _, phase in if phase == .active { Task { await vm.refreshActivity() } } }
     }
 
     private var dayHeader: some View {
@@ -110,6 +112,9 @@ private struct SummaryCard: View {
             }
             if summary.isCustomTarget {
                 Text(tr("diary_target_custom", summary.defaultKcal)).font(.footnote)
+            }
+            if let a = summary.activity {
+                Text(tr("diary_activity_adjust", a.kcal, a.actual, a.expected)).font(.footnote)
             }
             ProgressView(value: summary.kcalProgress)
             Text(summary.remainingKcal >= 0 ? tr("diary_remaining", summary.remainingKcal) : tr("diary_over", -summary.remainingKcal))

@@ -33,5 +33,47 @@
     "de": "Nicht jetzt",
     "es": "Ahora no",
     "fr": "Pas maintenant"
+  },
+  "health_title": {
+    "en": "Apple Health",
+    "bg": "Apple Health",
+    "de": "Apple Health",
+    "es": "Apple Health",
+    "fr": "Apple Santé"
+  },
+  "health_intro": {
+    "en": "Writes the food you log (calories, protein, carbs, fat) to Apple Health, so your other health apps can see it. KaloCalc sends nothing off your phone.",
+    "bg": "Записва храната, която въвеждаш (калории, протеини, въглехидрати, мазнини), в Apple Health, за да я виждат другите ти здравни приложения. KaloCalc не изпраща нищо извън телефона ти.",
+    "de": "Schreibt das Essen, das du einträgst (Kalorien, Eiweiß, Kohlenhydrate, Fett), in Apple Health, damit deine anderen Gesundheits-Apps es sehen können. KaloCalc sendet nichts von deinem Telefon weg.",
+    "es": "Escribe la comida que registras (calorías, proteínas, carbohidratos, grasas) en Apple Salud, para que tus otras apps de salud puedan verla. KaloCalc no envía nada fuera de tu teléfono.",
+    "fr": "Écrit les aliments que tu enregistres (calories, protéines, glucides, lipides) dans Apple Santé, pour que tes autres apps de santé puissent les voir. KaloCalc n'envoie rien hors de ton téléphone."
+  },
+  "health_switch": {
+    "en": "Sync with Apple Health",
+    "bg": "Синхронизиране с Apple Health",
+    "de": "Mit Apple Health synchronisieren",
+    "es": "Sincronizar con Apple Salud",
+    "fr": "Synchroniser avec Apple Santé"
+  },
+  "health_denied": {
+    "en": "Permission wasn't granted, so sync stays off. You can allow it in Settings → Health → Data Access & Devices → KaloCalc.",
+    "bg": "Разрешението не беше дадено, затова синхронизирането остава изключено. Можеш да го разрешиш в Настройки → Здраве → Достъп до данни и устройства → KaloCalc.",
+    "de": "Die Berechtigung wurde nicht erteilt, daher bleibt die Synchronisierung aus. Du kannst sie unter Einstellungen → Health → Datenzugriff & Geräte → KaloCalc erlauben.",
+    "es": "No se concedió el permiso, así que la sincronización sigue desactivada. Puedes permitirla en Ajustes → Salud → Acceso a datos y dispositivos → KaloCalc.",
+    "fr": "L'autorisation n'a pas été accordée, la synchronisation reste désactivée. Tu peux l'autoriser dans Réglages → Santé → Accès aux données et appareils → KaloCalc."
+  },
+  "health_failed": {
+    "en": "Couldn't write to Apple Health: %1$@",
+    "bg": "Не можа да се запише в Apple Health: %1$@",
+    "de": "Konnte nicht in Apple Health schreiben: %1$@",
+    "es": "No se pudo escribir en Apple Salud: %1$@",
+    "fr": "Impossible d'écrire dans Apple Santé : %1$@"
+  },
+  "health_activity_hint": {
+    "en": "Reads active calories burned from Apple Health. If a day differs a lot from the activity your norm already assumes, only the part beyond a ±25% margin is added to or taken off the target (never below your resting needs; today it only goes up). If nothing is recorded, or reading isn't allowed in Settings → Health, the target stays as it is.",
+    "bg": "Чете изгорените активни калории от Apple Health. Ако денят се различава много от активността, която нормата ти вече предполага, към целта се добавя или от нея се изважда само частта извън допуска ±25% (никога под калориите ти в покой; за днес само нараства). Ако няма записи или четенето не е разрешено в Настройки → Здраве, целта остава непроменена.",
+    "de": "Liest die verbrannten aktiven Kalorien aus Apple Health. Weicht ein Tag stark von der Aktivität ab, die dein Normwert schon annimmt, wird nur der Teil jenseits eines Spielraums von ±25 % zum Ziel addiert oder davon abgezogen (nie unter deinen Grundbedarf; heute steigt es nur). Ist nichts aufgezeichnet oder das Lesen unter Einstellungen → Health nicht erlaubt, bleibt das Ziel unverändert.",
+    "es": "Lee las calorías activas quemadas de Apple Salud. Si un día se aparta mucho de la actividad que tu norma ya supone, solo la parte que supera un margen de ±25 % se suma o se resta del objetivo (nunca por debajo de tus necesidades en reposo; hoy solo sube). Si no hay registros o la lectura no está permitida en Ajustes → Salud, el objetivo no cambia.",
+    "fr": "Lit les calories actives brûlées depuis Apple Santé. Si une journée s'écarte beaucoup de l'activité que ta norme suppose déjà, seule la part au-delà d'une marge de ±25 % est ajoutée à l'objectif ou retirée (jamais sous tes besoins au repos ; aujourd'hui, il ne fait que monter). Si rien n'est enregistré ou si la lecture n'est pas autorisée dans Réglages → Santé, l'objectif ne change pas."
   }
 }

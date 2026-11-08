@@ -33,6 +33,12 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
         NSCameraUsageDescription: The camera is used to photograph food and scan barcodes.
+        NSHealthUpdateUsageDescription: KaloCalc writes the food you log (calories, protein, carbs and fat) to Apple Health, only if you turn this on.
+        NSHealthShareUsageDescription: If you turn on the activity option, KaloCalc reads only the active calories burned for a day, on your phone, to adjust that day's calorie target. Nothing is sent anywhere.
+    entitlements:
+      path: KaloCalc/KaloCalc.entitlements
+      properties:
+        com.apple.developer.healthkit: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nikikabadzhov.kalocalc

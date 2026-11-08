@@ -18,12 +18,21 @@ final class SettingsViewModel {
     /// Set when a new key is about to be saved: the user must first agree to photos and search text going to Gemini.
     var askingConsent = false
 
+    // Apple Health
+    private(set) var healthSync: Bool
+    private(set) var healthActivity: Bool
+    private(set) var healthBusy = false
+    private(set) var healthMessage: String?
+    var healthAvailable: Bool { model.health.isAvailable }
+
     init(model: AppModel, transport: HTTPTransport = URLSessionTransport()) {
         self.model = model
         self.transport = transport
         let g = model.settingsStore.gemini
         gemini = g
         key = g.apiKey
+        healthSync = model.settingsStore.healthSync
+        healthActivity = model.settingsStore.activityAdjust
     }
 
     var dirty: Bool { key.trimmingCharacters(in: .whitespacesAndNewlines) != gemini.apiKey }
@@ -95,6 +104,42 @@ final class SettingsViewModel {
         saveKey()
         testResult = report(for: GeminiDiagnosis(models: ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3-pro"],
                                                  keyError: nil, model: gemini.model, modelWorks: true, modelError: nil))
+    }
+
+    func setHealthSync(_ on: Bool) async {
+        healthMessage = nil
+        if on {
+            guard await model.health.requestWriteAccess() else {
+                healthSync = false
+                model.settingsStore.saveHealthSync(false)
+                healthMessage = tr("health_denied")
+                return
+            }
+        }
+        healthSync = on
+        model.settingsStore.saveHealthSync(on)
+    }
+
+    func setHealthActivity(_ on: Bool) async {
+        healthMessage = nil
+        if on { _ = await model.health.requestActivityAccess() }
+        healthActivity = on
+        model.settingsStore.saveActivityAdjust(on)
+    }
+
+    /// Writes every diary entry to Apple Health; safe to repeat, because each entry has a fixed id.
+    func syncPastEntries() async {
+        guard !healthBusy else { return }
+        healthBusy = true
+        healthMessage = nil
+        do {
+            let entries = try model.repository.allEntries()
+            try await model.health.write(entries)
+            healthMessage = tr("hc_synced", entries.count)
+        } catch {
+            healthMessage = tr("health_failed", userMessage(for: error))
+        }
+        healthBusy = false
     }
 
     private func refresh() { gemini = model.settingsStore.gemini }

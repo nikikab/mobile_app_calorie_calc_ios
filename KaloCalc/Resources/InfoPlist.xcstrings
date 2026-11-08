@@ -41,31 +41,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Reads your active calories to adjust the daily goal."
+            "value": "If you turn on the activity option, KaloCalc reads only the active calories burned for a day, on your phone, to adjust that day's calorie target. Nothing is sent anywhere."
           }
         },
         "bg": {
           "stringUnit": {
             "state": "translated",
-            "value": "Чете активните ти калории, за да коригира дневната цел."
+            "value": "Ако включиш опцията за активност, KaloCalc чете само изгорените активни калории за деня, на телефона ти, за да коригира дневната цел. Нищо не се изпраща никъде."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Liest deine aktiven Kalorien, um das Tagesziel anzupassen."
+            "value": "Wenn du die Aktivitätsoption einschaltest, liest KaloCalc nur die verbrannten aktiven Kalorien eines Tages auf deinem Telefon, um das Kalorienziel dieses Tages anzupassen. Nichts wird irgendwohin gesendet."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lee tus calorías activas para ajustar el objetivo diario."
+            "value": "Si activas la opción de actividad, KaloCalc lee solo las calorías activas quemadas de un día, en tu teléfono, para ajustar el objetivo de calorías de ese día. No se envía nada a ningún sitio."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lit tes calories actives pour ajuster l'objectif quotidien."
+            "value": "Si tu actives l'option d'activité, KaloCalc lit uniquement les calories actives brûlées dans une journée, sur ton téléphone, pour ajuster l'objectif calorique de ce jour. Rien n'est envoyé nulle part."
           }
         }
       }
@@ -75,31 +75,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saves the food you log to Apple Health."
+            "value": "KaloCalc writes the food you log (calories, protein, carbs and fat) to Apple Health, only if you turn this on."
           }
         },
         "bg": {
           "stringUnit": {
             "state": "translated",
-            "value": "Записва храната, която въвеждаш, в Apple Health."
+            "value": "KaloCalc записва храната, която въвеждаш (калории, протеини, въглехидрати и мазнини), в Apple Health, само ако включиш това."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Speichert die erfassten Mahlzeiten in Apple Health."
+            "value": "KaloCalc schreibt das Essen, das du einträgst (Kalorien, Eiweiß, Kohlenhydrate und Fett), in Apple Health, nur wenn du das einschaltest."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Guarda la comida que registras en Apple Health."
+            "value": "KaloCalc escribe la comida que registras (calorías, proteínas, carbohidratos y grasas) en Apple Salud, solo si lo activas."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enregistre les aliments saisis dans Apple Santé."
+            "value": "KaloCalc écrit les aliments que tu enregistres (calories, protéines, glucides et lipides) dans Apple Santé, seulement si tu l'actives."
           }
         }
       }

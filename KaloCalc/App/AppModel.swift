@@ -12,12 +12,14 @@ final class AppModel {
     let profileStore: ProfileStore
     let settingsStore: SettingsStore
     let photos: PhotoStore
+    let health: HealthSync
     /// The language of the app; changing it redraws every screen.
     private(set) var language: AppLanguage
 
-    init(container: ModelContainer, values: KeyValueStore, secrets: SecretStore, photos: PhotoStore = .shared) {
+    init(container: ModelContainer, values: KeyValueStore, secrets: SecretStore, photos: PhotoStore = .shared, health: HealthSync? = nil) {
         self.container = container
         self.photos = photos
+        self.health = health ?? NoHealthSync()
         repository = Repository(context: container.mainContext, counters: values)
         profileStore = ProfileStore(values)
         settingsStore = SettingsStore(values, secrets: secrets)
@@ -34,15 +36,15 @@ final class AppModel {
     /// The real app: the store on disk, UserDefaults and the Keychain.
     static func live() -> AppModel {
         do {
-            return AppModel(container: try Persistence.makeContainer(), values: UserDefaultsStore(), secrets: KeychainSecretStore())
+            return AppModel(container: try Persistence.makeContainer(), values: UserDefaultsStore(), secrets: KeychainSecretStore(), health: HealthKitSync())
         } catch {
             fatalError("Could not open the database: \(error)")
         }
     }
 
     /// Empty and throwaway, for tests and previews.
-    static func inMemory() -> AppModel {
+    static func inMemory(health: HealthSync? = nil) -> AppModel {
         let memory = MemoryKeyValueStore()
-        return AppModel(container: try! Persistence.makeContainer(inMemory: true), values: memory, secrets: memory, photos: .temporary())
+        return AppModel(container: try! Persistence.makeContainer(inMemory: true), values: memory, secrets: memory, photos: .temporary(), health: health)
     }
 }

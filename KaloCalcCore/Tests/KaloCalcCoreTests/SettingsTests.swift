@@ -40,3 +40,14 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(AppLanguage.fr.englishName, "French")
     }
 }
+
+final class HealthSettingsTests: XCTestCase {
+    func testBothSwitchesStartOffAndAreRemembered() {
+        let memory = MemoryKeyValueStore()
+        let s = SettingsStore(memory, secrets: memory)
+        XCTAssertFalse(s.healthSync); XCTAssertFalse(s.activityAdjust)
+        s.saveHealthSync(true); s.saveActivityAdjust(true)
+        XCTAssertTrue(SettingsStore(memory, secrets: memory).healthSync)
+        XCTAssertTrue(SettingsStore(memory, secrets: memory).activityAdjust)
+    }
+}

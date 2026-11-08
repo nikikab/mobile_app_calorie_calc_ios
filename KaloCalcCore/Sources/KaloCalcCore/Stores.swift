@@ -84,6 +84,7 @@ public final class ProfileStore {
 /// The Gemini key (kept in the secret store), the chosen model and the user's own models.
 public final class SettingsStore {
     private static let keyKey = "gemini_key", modelKey = "gemini_model", customKey = "gemini_custom_models", languageKey = "app_language", consentKey = "gemini_consent"
+    private static let healthKey = "health_sync", activityKey = "health_activity_adjust"
     private let store: KeyValueStore
     private let secrets: SecretStore
     public init(_ store: KeyValueStore, secrets: SecretStore) { self.store = store; self.secrets = secrets }
@@ -105,6 +106,14 @@ public final class SettingsStore {
     public var geminiConsent: Bool { store.bool(Self.consentKey) ?? false }
 
     public func saveGeminiConsent(_ agreed: Bool) { store.set(agreed, for: Self.consentKey) }
+
+    /// Whether diary entries are written to Apple Health.
+    public var healthSync: Bool { store.bool(Self.healthKey) ?? false }
+    public func saveHealthSync(_ on: Bool) { store.set(on, for: Self.healthKey) }
+
+    /// Whether the day's target follows the active calories read from Apple Health.
+    public var activityAdjust: Bool { store.bool(Self.activityKey) ?? false }
+    public func saveActivityAdjust(_ on: Bool) { store.set(on, for: Self.activityKey) }
 
     /// The settings to send requests with: without the user's agreement the key is left out, so nothing is sent.
     public var geminiForSending: GeminiSettings {

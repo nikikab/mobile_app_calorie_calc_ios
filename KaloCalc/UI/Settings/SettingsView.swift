@@ -51,6 +51,7 @@ struct SettingsView: View {
             } header: {
                 Text(tr("settings_gemini_heading"))
             }
+            if vm.healthAvailable { healthSection }
             Section {
                 Text(tr("settings_notes")).font(.footnote).foregroundStyle(.secondary)
             }
@@ -67,6 +68,22 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $addingModel) {
             AddModelSheet(existing: vm.gemini.allModels) { vm.addModel($0) }
+        }
+    }
+
+    @ViewBuilder private var healthSection: some View {
+        Section {
+            Text(tr("health_intro")).font(.callout)
+            Toggle(tr("health_switch"), isOn: Binding(get: { vm.healthSync }, set: { on in Task { await vm.setHealthSync(on) } }))
+            if vm.healthSync {
+                Button(tr("hc_sync_past")) { Task { await vm.syncPastEntries() } }.disabled(vm.healthBusy)
+            }
+            Toggle(tr("hc_activity_switch"), isOn: Binding(get: { vm.healthActivity }, set: { on in Task { await vm.setHealthActivity(on) } }))
+            Text(tr("health_activity_hint")).font(.footnote).foregroundStyle(.secondary)
+            if vm.healthBusy { ProgressView() }
+            if let message = vm.healthMessage { Text(message).font(.footnote) }
+        } header: {
+            Text(tr("health_title"))
         }
     }
 
