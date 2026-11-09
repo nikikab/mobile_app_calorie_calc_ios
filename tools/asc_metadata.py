@@ -338,6 +338,14 @@ def apply(app_id, version_id):
         say("No processed build to select yet.")
 
 
+def capabilities_report():
+    """Which capabilities (HealthKit, ...) are enabled on the App ID."""
+    for b in data("GET", "/bundleIds?filter[identifier]=com.nikikabadzhov.kalocalc"):
+        say(f"Bundle ID {attrs(b).get('identifier')} ({b['id']})")
+        for c in data("GET", f"/bundleIds/{b['id']}/bundleIdCapabilities"):
+            say(f"  capability: {attrs(c).get('capabilityType')}")
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "inspect"
     app_id, name = find_app()
@@ -345,6 +353,9 @@ def main():
     if mode == "builds":
         builds_report(app_id)
         app_state_report(app_id)
+        return
+    if mode == "capabilities":
+        capabilities_report()
         return
     if mode == "newversion":
         create_version(app_id, os.environ.get("NEW_VERSION", "1.2"))
