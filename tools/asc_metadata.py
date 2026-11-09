@@ -346,6 +346,15 @@ def capabilities_report():
             say(f"  capability: {attrs(c).get('capabilityType')}")
 
 
+def enable_healthkit():
+    for b in data("GET", "/v1/bundleIds?filter[identifier]=com.nikikabadzhov.kalocalc"):
+        call("POST", "/v1/bundleIdCapabilities", {"data": {
+            "type": "bundleIdCapabilities", "attributes": {"capabilityType": "HEALTHKIT"},
+            "relationships": {"bundleId": {"data": {"type": "bundleIds", "id": b["id"]}}}}}, allow=(409,))
+        say("HealthKit enabled on the App ID (or it already was).")
+    capabilities_report()
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "inspect"
     app_id, name = find_app()
@@ -353,6 +362,9 @@ def main():
     if mode == "builds":
         builds_report(app_id)
         app_state_report(app_id)
+        return
+    if mode == "enable-healthkit":
+        enable_healthkit()
         return
     if mode == "capabilities":
         capabilities_report()
