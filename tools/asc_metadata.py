@@ -340,9 +340,9 @@ def apply(app_id, version_id):
 
 def capabilities_report():
     """Which capabilities (HealthKit, ...) are enabled on the App ID."""
-    for b in data("GET", "/bundleIds?filter[identifier]=com.nikikabadzhov.kalocalc"):
+    for b in data("GET", "/v1/bundleIds?filter[identifier]=com.nikikabadzhov.kalocalc"):
         say(f"Bundle ID {attrs(b).get('identifier')} ({b['id']})")
-        for c in data("GET", f"/bundleIds/{b['id']}/bundleIdCapabilities"):
+        for c in data("GET", f"/v1/bundleIds/{b['id']}/bundleIdCapabilities"):
             say(f"  capability: {attrs(c).get('capabilityType')}")
 
 
