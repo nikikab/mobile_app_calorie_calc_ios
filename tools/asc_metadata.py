@@ -370,7 +370,7 @@ def main():
         capabilities_report()
         return
     if mode == "newversion":
-        create_version(app_id, os.environ.get("NEW_VERSION", "1.2"))
+        create_version(app_id, os.environ.get("NEW_VERSION", "1.3"))
         return
     if mode == "version":
         version_report(app_id)
